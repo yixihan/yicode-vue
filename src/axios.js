@@ -6,11 +6,11 @@ import store from './store'
 // 引入路由
 import router from './router/'
 
-var s = window.location.toString()
-var s1 = s.substr(7, s.length)
-var s2 = s1.indexOf('/')
-s = s.substr(0, 8 + s2)
-var a = 'http://192.168.3.2:9090/api/'
+let s = window.location.toString();
+const s1 = s.substring(7, s.length);
+const s2 = s1.indexOf('/');
+s = s.substring(0, 8 + s2)
+const a = 'http://192.168.101.30:11000/api/';
 
 // 配置默认前缀
 axios.defaults.baseURL = a
@@ -19,17 +19,17 @@ axios.defaults.headers.post['Content-Type'] = 'application/json'
 // 添加请求拦截器，在请求头中加token
 axios.interceptors.request.use(
     config => {
-        // console.log(config)
-        // if (!config.url.includes('http://192.168.3.2:9090')) { return config }
-        if (localStorage.getItem('token') !== '' && (config.url.includes('gxc') || config.url.includes('register'))) {
-            // console.log(localStorage.getItem('satoken'))
-            config.headers.Authorization = localStorage.getItem('token')
-            config.headers.satoken = localStorage.getItem('token')
-        }
-        return config
-    },
-    error => {
-        return Promise.reject(error)
+        return config;
+    //     console.log(config)
+    //     if (localStorage.getItem('token') !== '' && (config.url.includes('gxc') || config.url.includes('register'))) {
+    //         console.log(localStorage.getItem('satoken'))
+    //         config.headers.Authorization = localStorage.getItem('token')
+    //         config.headers.satoken = localStorage.getItem('token')
+    //     }
+    //     return config
+    // },
+    // error => {
+    //     return Promise.reject(error)
     }
 )
 
@@ -41,10 +41,10 @@ axios.interceptors.response.use(
         if (res.code === 0) {
             return response
         } else if (res.code === 1000) {
-            Element.Message.error('操作失败, 请联系管理员', { duration: 2 * 1000 })
+            Element.Message.error('操作失败, 请联系管理员', {duration: 2 * 1000})
             return Promise.reject(response.data.msg)
         } else {
-            Element.Message.error(res.msg, { duration: 2 * 1000 })
+            Element.Message.error(res.msg, {duration: 2 * 1000})
             // 返回一个异常提示就不会继续往下走了 不+的话 res=>的里面 还是会继续走的
             return Promise.reject(response.data.msg)
         }

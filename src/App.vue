@@ -1,12 +1,60 @@
 <template>
   <div id="app">
-    <nav>
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </nav>
-    <router-view/>
+    <router-view v-if="isRouterAlive"></router-view>
   </div>
 </template>
+
+<script>
+export default {
+  name: "App",
+  provide() {
+    return {
+      reload: this.reload,
+    };
+  },
+  data() {
+    return {
+      isRouterAlive: true,
+    };
+  },
+  created() {
+    // this.init();
+  },
+  methods: {
+    reload() {
+      this.isRouterAlive = false;
+      this.$nextTick(function () {
+        this.isRouterAlive = true;
+      });
+    },
+    // async getUserInfo() {
+    //   const data = await this.axios({
+    //     url: "/user/getUserInfo",
+    //     method: "post",
+    //     data: {
+    //       userId: this.$store.getters.getUserId,
+    //     },
+    //     headers: {
+    //       "Jwt-Token": this.$store.getters.getToken,
+    //     },
+    //   });
+    //
+    //   return data;
+    // },
+    // init() {
+    //   if (
+    //       this.$store.getters.getUserId != null &&
+    //       this.$store.getters.getUserId != ""
+    //   ) {
+    //     this.getUserInfo().then(({ data }) => {
+    //       const userInfo = data.data;
+    //       this.$store.commit("SET_USERINFO", userInfo);
+    //     });
+    //   }
+    // },
+  },
+}
+</script>
 
 <style lang="scss">
 #app {
