@@ -14,7 +14,19 @@ const routes = [
   {
     path: '/',
     name: 'home',
-    component: () => import('../views/Main.vue')
+    component: () => import('../views/Main.vue'),
+    children: [
+      {
+        path: '/login',
+        name: 'Login',
+        component: () => import('../views/auth/Login.vue')
+      },
+      {
+        path: '/',
+        name: 'Index',
+        component: () => import('../views/Index.vue')
+      }
+    ]
   },
 ]
 

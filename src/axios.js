@@ -38,7 +38,7 @@ axios.interceptors.response.use(
     (response) => {
         const res = response.data
         // console.log(res)
-        if (res.code === 0) {
+        if (res.code === 200) {
             return response
         } else if (res.code === 1000) {
             Element.Message.error('操作失败, 请联系管理员', {duration: 2 * 1000})

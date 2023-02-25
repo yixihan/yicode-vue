@@ -23,6 +23,7 @@ export default {
 
 <style scoped lang="scss">
 .main {
-
+  display: flex;
+  justify-content: center;
 }
 </style>

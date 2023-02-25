@@ -1,0 +1,25 @@
+
+.index {
+  width: 70vw;
+  max-width: 1280px;
+  min-width: 920px;
+  height: 800px;
+  background: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .index_left {
+    flex-grow: 1;
+    height: 800px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .index_right {
+    width: 260px;
+    height: 800px;
+    display: flex;
+    flex-direction: column;
+  }
+}

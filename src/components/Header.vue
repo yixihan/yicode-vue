@@ -1,17 +1,21 @@
 <template>
   <div class="nav">
     <ul>
-      <li class="logo">
-
-      </li>
+      <li class="logo"></li>
       <li class="col">题库</li>
+      <li class="col">题单</li>
+
       <li class="col bank"></li>
-      <li class="col" v-if="!isLogin" @click="login">登录</li>
+
       <li class="col" v-if="!isLogin">注册</li>
+      <li class="col" v-if="!isLogin" @click="login">登录</li>
+
+      <li class="col bell-icon" v-if="isLogin">
+        <i class="el-icon-bell"></i>
+      </li>
       <li class="col" v-if="isLogin">
         <i class="el-icon-user">个人中心</i>
       </li>
-
       <li class="col" v-if="isLogin" @click="logout">注销</li>
     </ul>
   </div>
@@ -27,7 +31,8 @@ export default {
   },
   methods: {
     login() {
-      this.isLogin = true
+      // this.isLogin = true
+      this.$router.push("/login");
     },
     logout() {
       this.isLogin = false
@@ -95,6 +100,11 @@ export default {
         background: #ffffff !important;
         color: #fff;
       }
+    }
+
+    .bell-icon {
+      min-width: auto !important;
+      width: 40px !important;
     }
 
     .text {
