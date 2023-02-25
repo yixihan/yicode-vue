@@ -62,6 +62,7 @@ export default {
     },
     isAdmin() {
       return this.$store.getters.getUserRoleList !== null
+          && this.$store.getters.getUserRoleList !== ""
           && this.$store.getters.getUserRoleList !== []
           && this.$store.getters.getUserRoleList
               .some(item => item.roleName !== "USER")

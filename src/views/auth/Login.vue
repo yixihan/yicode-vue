@@ -32,7 +32,7 @@
           </div>
           <div class="login_info_input verification">
             <input type="text" placeholder="验证码" v-model="user.code">
-            <div class="verification_img" @click="getPhotoCodeImg">
+            <div class="verification_img" @click="getPhotoCode">
               <img :src="photoCodeImg" alt="验证码正在加载中"/>
             </div>
             <div class="forget_pwd">忘记密码?</div>
@@ -48,7 +48,7 @@
           </div>
           <div class="login_info_input verification">
             <input type="text" placeholder="验证码" v-model="user.code">
-            <div class="verification_code">获取验证码</div>
+            <div class="verification_code" @click="sendEmailCode">获取验证码</div>
           </div>
           <div class="login_info_input">
             <button @click="login">登录</button>
@@ -61,7 +61,7 @@
           </div>
           <div class="login_info_input verification">
             <input type="text" placeholder="验证码" v-model="user.code">
-            <div class="verification_code">获取验证码</div>
+            <div class="verification_code" @click="sendMobileCode">获取验证码</div>
           </div>
           <div class="login_info_input">
             <button @click="login">登录</button>
@@ -96,7 +96,7 @@ export default {
     }
   },
   mounted() {
-    this.getPhotoCodeImg()
+    this.getPhotoCode()
   },
   methods: {
     // 改变登录方式
@@ -106,18 +106,33 @@ export default {
     // 登录
     login() {
       // 输入校验
-      if (!this.validateInput()) {
+      if (!this.loginValidate()) {
         return
       }
       // 登录
       let promise
       if (this.showLogin === 1) {
+        // 校验邮箱验证码
+        if (!this.validatePhotoCode()) {
+          // 刷新图片验证码
+          this.getPhotoCode()
+          return;
+        }
         promise = this.asyncLoginByPhotoCode()
       } else if (this.showLogin === 2) {
+        // 校验邮箱验证码
+        if (!this.validateEmailCode()) {
+          return;
+        }
         promise = this.asyncLoginByEmail()
       } else if (this.showLogin === 3) {
+        // 校验短信验证码
+        if (!this.validateMobileCode()) {
+          return;
+        }
         promise = this.asyncLoginByMobile()
       } else {
+        this.getPhotoCode()
         errorMsg("错误的登录方式!")
         return;
       }
@@ -129,13 +144,14 @@ export default {
         this.asyncGetLoginUserInfo().then(({data}) => {
           this.$store.commit("setUserInfo", data.data)
         })
-
         // 跳转到首页
         this.$router.push("/");
+      }).catch(() => {
+        this.getPhotoCode()
       })
     },
     // 输入校验
-    validateInput() {
+    loginValidate() {
       if (this.showLogin === 1) {
         // 图片验证码登录
         if (!validate.validateUserName(this.user.username)) {
@@ -178,9 +194,61 @@ export default {
         return false
       }
     },
+    // 发送邮件验证码
+    sendEmailCode() {
+      // 校验输入
+      if (! validate.validateEmail(this.user.email)) {
+        errorMsg("邮箱不符合输入规范!")
+        return
+      }
+      this.asyncSendEmail().then(({data}) => {
+        successMsg(data.data.message)
+      })
+    },
+    // 校验邮箱验证码
+    validateEmailCode() {
+      // 校验输入
+      if (!validate.validateEmail(this.user.email)) {
+        errorMsg("邮箱不符合输入规范!")
+        return false
+      }
+      if (!validate.validateCode(this.user.code)) {
+        errorMsg("验证码不符合输入规范!")
+        return false
+      }
+      this.asyncValidateEmailCode()
+
+      return true
+    },
+    // 发送短信验证码
+    sendMobileCode() {
+      // 校验输入
+      if (! validate.validateMobile(this.user.mobile)) {
+        errorMsg("邮箱不符合输入规范!")
+        return
+      }
+      this.asyncSendMobile().then(({data}) => {
+        successMsg(data.data.message)
+      })
+    },
+    // 校验短信验证码
+    validateMobileCode() {
+      // 校验输入
+      if (!validate.validateMobile(this.user.mobile)) {
+        errorMsg("手机号不符合输入规范!")
+        return false
+      }
+      if (!validate.validateCode(this.user.code)) {
+        errorMsg("验证码不符合输入规范!")
+        return false
+      }
+      this.asyncValidateMobileCode()
+
+      return true
+    },
     // 获取图片验证码
-    getPhotoCodeImg() {
-      this.asyncGetPhotoCodeImg().then(({data}) => {
+    getPhotoCode() {
+      this.asyncGetPhotoCode().then(({data}) => {
         let blob = data
         let reader = new FileReader()
         // 转为 base64
@@ -189,6 +257,17 @@ export default {
           this.photoCodeImg = reader.result
         }
       })
+    },
+    // 校验图片验证码
+    validatePhotoCode() {
+      // 校验输入
+      if (!validate.validateCode(this.user.code)) {
+        errorMsg("验证码不符合输入规范!")
+        return false
+      }
+      this.asyncValidatePhotoCode()
+
+      return true
     },
     // 异步方法 => 图片验证码登录
     async asyncLoginByPhotoCode() {
@@ -223,7 +302,7 @@ export default {
     async asyncLoginByEmail() {
       // 组装 data 数据
       const data = {
-        "grant_type": "mail",
+        "grant_type": "email",
         "username": this.user.email,
         "code": this.user.code,
         "send-type": "LOGIN",
@@ -244,28 +323,75 @@ export default {
         data: data
       });
     },
+    // 异步方法 => 发送邮件
+    async asyncSendEmail() {
+      return await this.$axios({
+        url: "/yicode-thirdpart-openapi/open/email/send/email/login",
+        method: "post",
+        data: {
+          "email": this.user.email
+        }
+      });
+    },
+    // 异步方法 => 校验邮箱验证码
+    async asyncValidateEmailCode() {
+      return await this.$axios({
+        url: "/yicode-thirdpart-openapi/open/email/validate/login",
+        method: "post",
+        data: {
+          "email": this.user.email,
+          "code": this.user.code
+        }
+      });
+    },
+    // 异步方法 => 发送短信
+    async asyncSendMobile() {
+      return await this.$axios({
+        url: "/yicode-thirdpart-openapi/open/sms/send/mobile/login",
+        method: "post",
+        data: {
+          "mobile": this.user.mobile
+        }
+      });
+    },
+    // 异步方法 => 校验短信验证码
+    async asyncValidateMobileCode() {
+      return await this.$axios({
+        url: "/yicode-thirdpart-openapi/open/sms/validate/login",
+        method: "post",
+        data: {
+          "mobile": this.user.mobile,
+          "code": this.user.code
+        }
+      });
+    },
+    // 异步方法 => 获取图片验证码
+    async asyncGetPhotoCode() {
+      this.uuid = uuid();
+      return await this.$axios({
+        url: "/yicode-thirdpart-openapi/open/code/create?uuid=" + this.uuid,
+        method: "get",
+        responseType: "blob"
+      })
+    },
+    // 异步方法 => 获取图片验证码
+    async asyncValidatePhotoCode() {
+      return await this.$axios({
+        url: "/yicode-thirdpart-openapi/open/code/validate",
+        method: "post",
+        data: {
+          "uuid": this.uuid,
+          "code": this.user.code
+        }
+      })
+    },
     // 异步方法 => 获取登录用户信息
     async asyncGetLoginUserInfo() {
       return await this.$axios({
         url: "/yicode-user-openapi/open/user/now",
         method: "get",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
       });
     },
-    // 异步方法 => 获取图片验证码
-    async asyncGetPhotoCodeImg() {
-      this.uuid = uuid();
-      return await this.$axios({
-        url: "/yicode-thirdpart-openapi/open/code/create?uuid=" + this.uuid,
-        method: "get",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        responseType: "blob"
-      })
-    }
   }
 }
 </script>

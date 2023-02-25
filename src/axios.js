@@ -1,10 +1,9 @@
 // 引入axios依赖
 import axios from 'axios'
-// 引入element-ui依赖
-import Element from 'element-ui'
 import store from './store'
 // 引入路由
 import router from './router/'
+import {errorMsg} from "@/util/elementMsgUtil";
 
 let s = window.location.toString();
 const s1 = s.substring(7, s.length);
@@ -33,6 +32,7 @@ axios.interceptors.request.use(
 
 const photoCodeUrl = "/open/code/create"
 const qrUrl = "/open/qr/create"
+const authUrl = "/oauth/token"
 
 // 配置后置拦截
 axios.interceptors.response.use(
@@ -46,11 +46,8 @@ axios.interceptors.response.use(
     // console.log(res)
     if (res.code === 200) {
       return response
-    } else if (res.code === 1000) {
-      Element.Message.error('操作失败, 请联系管理员', {duration: 2 * 1000})
-      return Promise.reject(response.data.msg)
-    } else {
-      Element.Message.error(res.msg, {duration: 2 * 1000})
+    }  else {
+      errorMsg(res.message)
       // 返回一个异常提示就不会继续往下走了 不+的话 res=>的里面 还是会继续走的
       return Promise.reject(response.data.msg)
     }
@@ -58,9 +55,9 @@ axios.interceptors.response.use(
   },
   (error) => {
     // 使得异常信息更加友好
-    if (error.request.responseURL.includes('login')) {
-      Element.Message.error('手机号/邮箱有误')
-      return
+    if (error.request.responseURL.includes(authUrl)) {
+      errorMsg("账户或密码错误")
+      return Promise.reject(error)
     }
     console.log('error : ', error)
     if (error.response.msg) {
@@ -76,7 +73,7 @@ axios.interceptors.response.use(
       // 跳转登录页面
       router.push('/login')
     }
-    Element.Message.error(error.message)
+    errorMsg(error.message)
 
     return Promise.reject(error)
   }
