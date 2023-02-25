@@ -17,14 +17,21 @@ const routes = [
     component: () => import('../views/Main.vue'),
     children: [
       {
+        path: '/',
+        name: 'Index',
+        component: () => import('../views/Index.vue')
+      },
+      {
         path: '/login',
         name: 'Login',
         component: () => import('../views/auth/Login.vue')
       },
+
+      // admin
       {
-        path: '/',
-        name: 'Index',
-        component: () => import('../views/Index.vue')
+        path: "/admin/center",
+        name: "AdminCenter",
+        component: () => import("../views/adminCenter/AdminCenter.vue")
       }
     ]
   },

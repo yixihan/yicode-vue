@@ -7,13 +7,16 @@
 
       <li class="col bank"></li>
 
-      <li class="col" v-if="!isLogin">注册</li>
-      <li class="col" v-if="!isLogin" @click="login">登录</li>
+      <li class="col" v-if="!isLogin" @click="toRegister">注册</li>
+      <li class="col" v-if="!isLogin" @click="toLogin">登录</li>
 
       <li class="col bell-icon" v-if="isLogin">
         <i class="el-icon-bell"></i>
       </li>
-      <li class="col" v-if="isLogin">
+      <li class="col" v-if="isAdmin" @click="toAdminCenter">
+        <i class="">管理中心</i>
+      </li>
+      <li class="col" v-if="isLogin" @click="toUserCenter">
         <i class="el-icon-user">个人中心</i>
       </li>
       <li class="col" v-if="isLogin" @click="logout">注销</li>
@@ -26,16 +29,42 @@ export default {
   name: "Header",
   data() {
     return {
-      isLogin: true,
     };
   },
   methods: {
-    login() {
+    // 跳转到登录页面
+    toLogin() {
       // this.isLogin = true
       this.$router.push("/login");
     },
+    // 跳转到注册页面
+    toRegister() {
+      this.$router.push("/register");
+    },
+    // 跳转到个人中心页面
+    toUserCenter() {
+      this.$router.push("/userCenter/center/" + this.$store.getters.getUserId)
+    },
+    toAdminCenter() {
+      this.$router.push("/admin/center")
+    },
+    // 退出登录
     logout() {
-      this.isLogin = false
+      this.$store.commit("removeInfo")
+      this.$router.push("/");
+    }
+
+  },
+  computed: {
+    isLogin() {
+      return this.$store.getters.getAccessToken !== null
+          && this.$store.getters.getAccessToken !== ""
+    },
+    isAdmin() {
+      return this.$store.getters.getUserRoleList !== null
+          && this.$store.getters.getUserRoleList !== []
+          && this.$store.getters.getUserRoleList
+              .some(item => item.roleName !== "USER")
     }
   }
 }
@@ -88,7 +117,7 @@ export default {
       box-sizing: border-box;
       height: 70px;
       width: 70px;
-      background: url("~@/assets/logo.png") no-repeat;
+      background: url("~@/assets/img/logo.png") no-repeat;
       background-size: contain;
       cursor: pointer;
     }

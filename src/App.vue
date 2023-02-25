@@ -29,7 +29,7 @@ export default {
     },
     // async getUserInfo() {
     //   const data = await this.axios({
-    //     url: "/user/getUserInfo",
+    //     url: "/userCenter/getUserInfo",
     //     method: "post",
     //     data: {
     //       userId: this.$store.getters.getUserId,

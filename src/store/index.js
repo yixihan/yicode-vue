@@ -8,22 +8,25 @@ export default new Vuex.Store({
     accessToken: localStorage.getItem("accessToken"),
     refreshToken: localStorage.getItem("refreshToken"),
     userId: localStorage.getItem("userId"),
-    user: JSON.parse(sessionStorage.getItem("user")),
-    userInfo: JSON.parse(sessionStorage.getItem("userInfo")),
-    userRoleList: JSON.parse(sessionStorage.getItem("userRoleList")),
+    user: JSON.parse(localStorage.getItem("user")),
+    userInfo: JSON.parse(localStorage.getItem("userInfo")),
+    userRoleList: JSON.parse(localStorage.getItem("userRoleList")),
   },
   getters: {
-    getUserInfo: state => {
-      return state.userInfo
-    },
-    getUserId: state => {
-      return state.userId
-    },
     getAccessToken: state => {
       return state.accessToken
     },
     getRefreshToken: state => {
       return state.refreshToken
+    },
+    getUserId: state => {
+      return state.userId
+    },
+    getUserInfo: state => {
+      return state.userInfo
+    },
+    getUserRoleList: state => {
+      return state.userRoleList
     }
   },
   mutations: {
@@ -52,7 +55,7 @@ export default new Vuex.Store({
       state.userId = ""
       state.user = {}
       state.userInfo = {}
-      state.userRoleList = {}
+      state.userRoleList = []
       localStorage.setItem("accessToken", "")
       localStorage.setItem("refreshToken", "")
       localStorage.setItem("userId", "")
