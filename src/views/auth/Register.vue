@@ -119,6 +119,8 @@ export default {
       promise.then(({data}) => {
         console.log(data)
         successMsg(data.data.message)
+        // 跳转到登录页面
+        this.$router.push("/login")
       })
     },
     // 输入校验

@@ -35,7 +35,7 @@
             <div class="verification_img" @click="getPhotoCode">
               <img :src="photoCodeImg" alt="验证码正在加载中"/>
             </div>
-            <div class="forget_pwd">忘记密码?</div>
+            <div class="forget_pwd" @click="toResetPassword">忘记密码?</div>
           </div>
           <div class="login_info_input">
             <button @click="login">登录</button>
@@ -102,6 +102,9 @@ export default {
     // 改变登录方式
     changeShow(val) {
       this.showLogin = val
+    },
+    toResetPassword() {
+      this.$router.push("/resetPassword")
     },
     // 登录
     login() {

@@ -19,17 +19,23 @@ const routes = [
       {
         path: '/',
         name: 'Index',
-        component: () => import('../views/Index.vue')
+        component: () => import('@/views/Index.vue')
       },
+      // auth
       {
         path: '/login',
         name: 'Login',
-        component: () => import('../views/auth/Login.vue')
+        component: () => import('@/views/auth/Login.vue')
       },
       {
         path: "/register",
         name: "Register",
-        component: () => import("../views/auth/Register.vue")
+        component: () => import("@/views/auth/Register.vue")
+      },
+      {
+        path: "/resetPassword",
+        name: "ResetPassword",
+        component: () => import("@/views/auth/ResetPassword.vue")
       },
 
       // admin
