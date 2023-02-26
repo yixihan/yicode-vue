@@ -112,7 +112,7 @@ export default {
       // 登录
       let promise
       if (this.showLogin === 1) {
-        // 校验邮箱验证码
+        // 校验图片验证码
         if (!this.validatePhotoCode()) {
           // 刷新图片验证码
           this.getPhotoCode()

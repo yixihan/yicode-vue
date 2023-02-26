@@ -41,7 +41,7 @@
           </div>
           <div class="login_info_input verification">
             <input type="text" placeholder="验证码" v-model="user.code">
-            <div class="verification_code">获取验证码</div>
+            <div class="verification_code" @click="sendEmailCode">获取验证码</div>
           </div>
           <div class="login_info_input">
             <button @click="register">注册</button>
@@ -54,7 +54,7 @@
           </div>
           <div class="login_info_input verification">
             <input type="text" placeholder="验证码" v-model="user.code">
-            <div class="verification_code">获取验证码</div>
+            <div class="verification_code" @click="sendMobileCode">获取验证码</div>
           </div>
           <div class="login_info_input">
             <button @click="register">注册</button>
@@ -66,6 +66,9 @@
 </template>
 
 <script>
+import * as validate from "@/util/validateUtil";
+import {errorMsg, successMsg} from "@/util/elementMsgUtil";
+
 export default {
   name: "Login",
   data() {
@@ -73,26 +76,188 @@ export default {
       // 展示登录方式或注册，1 验证码登录，2 密码登录，3 注册
       showRegister: 1,
       user: {
-        username: "yixihan",
-        password: "Theyear123.",
-        mobile: "17623850426",
-        email: "3113788997@qq.com",
-        code: "12345"
+        username: "",
+        password: "",
+        mobile: "",
+        email: "",
+        code: ""
       },
     }
   },
   methods: {
-    changeShow (val) {
-      // 改变登录方式
+    // 改变登录方式
+    changeShow(val) {
       this.showRegister = val
     },
+    // 注册
     register() {
-      console.log("user", this.user)
+      // 输入校验
+      if (!this.registerValidate()) {
+        return
+      }
+      // 登录
+      let promise
+      if (this.showRegister === 1) {
+        promise = this.asyncRegisterByUserName()
+      } else if (this.showRegister === 2) {
+        // 校验邮箱验证码
+        if (!this.validateEmailCode()) {
+          return;
+        }
+        promise = this.asyncRegisterByEmail()
+      } else if (this.showRegister === 3) {
+        // 校验短信验证码
+        if (!this.validateMobileCode()) {
+          return;
+        }
+        promise = this.asyncRegisterByMobile()
+      } else {
+        errorMsg("错误的注册方式!")
+        return;
+      }
+
+      promise.then(({data}) => {
+        console.log(data)
+        successMsg(data.data.message)
+      })
+    },
+    // 输入校验
+    registerValidate() {
+      if (this.showRegister === 1) {
+        // 图片验证码登录
+        if (!validate.validateUserName(this.user.username)) {
+          errorMsg("用户名不符合输入规范!")
+          return false
+        }
+        if (!validate.validatePassword(this.user.password)) {
+          errorMsg("密码不符合输入规范!")
+          return false
+        }
+        return true
+      } else if (this.showRegister === 2) {
+        // 邮件登录
+        if (!validate.validateEmail(this.user.email)) {
+          errorMsg("邮箱不符合输入规范!")
+          return false
+        }
+        if (!validate.validateCode(this.user.code)) {
+          errorMsg("验证码不符合输入规范!")
+          return false
+        }
+        return true
+      } else if (this.showRegister === 3) {
+        // 手机号登录
+        if (!validate.validateMobile(this.user.mobile)) {
+          errorMsg("手机号不符合输入规范!")
+          return false
+        }
+        if (!validate.validateCode(this.user.code)) {
+          errorMsg("验证码不符合输入规范!")
+          return false
+        }
+        return true
+      } else {
+        errorMsg("错误的登录方式!")
+        return false
+      }
+    },
+    // 发送邮件验证码
+    sendEmailCode() {
+      // 校验输入
+      if (!validate.validateEmail(this.user.email)) {
+        errorMsg("邮箱不符合输入规范!")
+        return
+      }
+      this.asyncSendEmail().then(({data}) => {
+        successMsg(data.data.message)
+      })
+    },
+    // 校验邮箱验证码
+    validateEmailCode() {
+      // 校验输入
+      if (!validate.validateEmail(this.user.email)) {
+        errorMsg("邮箱不符合输入规范!")
+        return false
+      }
+      if (!validate.validateCode(this.user.code)) {
+        errorMsg("验证码不符合输入规范!")
+        return false
+      }
+      this.asyncValidateEmailCode()
+
+      return true
+    },
+    // 发送短信验证码
+    sendMobileCode() {
+      // 校验输入
+      if (!validate.validateMobile(this.user.mobile)) {
+        errorMsg("邮箱不符合输入规范!")
+        return
+      }
+      this.asyncSendMobile().then(({data}) => {
+        successMsg(data.data.message)
+      })
+    },
+    // 校验短信验证码
+    validateMobileCode() {
+      // 校验输入
+      if (!validate.validateMobile(this.user.mobile)) {
+        errorMsg("手机号不符合输入规范!")
+        return false
+      }
+      if (!validate.validateCode(this.user.code)) {
+        errorMsg("验证码不符合输入规范!")
+        return false
+      }
+      this.asyncValidateMobileCode()
+
+      return true
+    },
+    // 异步方法 => 用户名注册
+    async asyncRegisterByUserName() {
+      // 组装 data
+      let data = {
+        "userName": this.user.username,
+        "password": this.user.password,
+        "type": "USERNAME_PASSWORD"
+      }
+
+      return await this.asyncRegister(data)
+    },
+    // 异步方法 => 邮箱注册
+    async asyncRegisterByEmail() {
+      // 组装 data
+      let data = {
+        "email": this.user.email,
+        "code": this.user.code,
+        "type": "EMAIL_CODE"
+      }
+
+      return await this.asyncRegister(data)
+    },
+    // 异步方法 => 手机号注册
+    async asyncRegisterByMobile() {
+      // 组装 data
+      let data = {
+        "mobile": this.user.mobile,
+        "code": this.user.code,
+        "type": "MOBILE_CODE"
+      }
+
+      return await this.asyncRegister(data)
+    },
+    // 异步方法 => 用户注册
+    async asyncRegister(data) {
+      return await this.$axios({
+        url: "/yicode-user-openapi/open/user/register",
+        method: "post",
+        data: data
+      })
     },
     // 异步方法 => 发送邮件
     async asyncSendEmail() {
       return await this.$axios({
-        url: "/yicode-thirdpart-openapi/open/email/send/email/login",
+        url: "/yicode-thirdpart-openapi/open/email/send/email/register",
         method: "post",
         data: {
           "email": this.user.email
@@ -102,7 +267,7 @@ export default {
     // 异步方法 => 校验邮箱验证码
     async asyncValidateEmailCode() {
       return await this.$axios({
-        url: "/yicode-thirdpart-openapi/open/email/validate/login",
+        url: "/yicode-thirdpart-openapi/open/email/validate/register",
         method: "post",
         data: {
           "email": this.user.email,
@@ -113,7 +278,7 @@ export default {
     // 异步方法 => 发送短信
     async asyncSendMobile() {
       return await this.$axios({
-        url: "/yicode-thirdpart-openapi/open/sms/send/mobile/login",
+        url: "/yicode-thirdpart-openapi/open/sms/send/mobile/register",
         method: "post",
         data: {
           "mobile": this.user.mobile
@@ -123,7 +288,7 @@ export default {
     // 异步方法 => 校验短信验证码
     async asyncValidateMobileCode() {
       return await this.$axios({
-        url: "/yicode-thirdpart-openapi/open/sms/validate/login",
+        url: "/yicode-thirdpart-openapi/open/sms/validate/register",
         method: "post",
         data: {
           "mobile": this.user.mobile,
