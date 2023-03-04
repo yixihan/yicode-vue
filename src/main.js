@@ -11,7 +11,10 @@ import ElementUi from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 import mavonEditor from 'mavon-editor'
 import 'mavon-editor/dist/css/index.css'
+import * as echarts from 'echarts'
 
+
+Vue.prototype.$echarts = echarts
 Vue.prototype.$axios = axios
 
 Vue.use(Vuex)

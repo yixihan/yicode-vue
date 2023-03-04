@@ -1,0 +1,353 @@
+<template>
+  <div class="question-bank">
+<!--    功能区-->
+    <div class="function-area">
+<!--      难度-->
+      <div class="question-select">
+        <el-select v-model="difficultyValue" placeholder="难度">
+          <el-option
+              v-for="item in difficultyOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            <span style="float: left; color: #00af9b;"  v-if="item.value === '1'">{{ item.label }}</span>
+            <span style="float: left; color: #ffb800;"  v-if="item.value === '2'">{{ item.label }}</span>
+            <span style="float: left; color: #ff2d55;"  v-if="item.value === '3'">{{ item.label }}</span>
+          </el-option>
+        </el-select>
+      </div>
+<!--      状态-->
+      <div class="question-select">
+        <el-select placeholder="状态" v-model="stateValue">
+          <el-option
+              v-for="item in stateOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+          </el-option>
+        </el-select>
+      </div>
+<!--      标签-->
+      <div class="question-select" >
+        <el-select v-model="labelValue" placeholder="标签" @click.native="changeTypeShow()">
+        </el-select>
+        <transition name="fade">
+          <div class="select-type" v-show="isType">
+            <div class="question-search">
+              <i class="el-icon-search"></i>
+              <input type="text"/>
+            </div>
+            <div class="select-type-singles">
+              <span>数组</span>
+              <span>字符串</span>
+              <span>动态规划</span>
+              <span>深度优先搜索</span>
+              <span>数组</span>
+            </div>
+          </div>
+        </transition>
+      </div>
+<!--      搜索框-->
+      <div class="question-search">
+        <i class="el-icon-search"></i>
+        <input type="text"/>
+      </div>
+<!--      重置-->
+      <div class="question-refresh">
+        <i class="el-icon-refresh-right">重置</i>
+      </div>
+<!--      随机一题-->
+      <div class="question-random">
+        <svg t="1677667359052" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5622" width="30" height="30"><path d="M228.6 295c2-3.2 2.2-7.2 0.5-10.6-3.8-7.5-5.8-15.9-5.8-24.3 0-19.6 10.6-37.6 27.8-47.4 17.2-9.8 38.4-9.8 55.6 0 17.2 9.8 27.8 27.9 27.8 47.4 0 8.4-2 16.8-5.8 24.3-1.7 3.4-1.5 7.4 0.5 10.6 2 3.2 5.6 5.2 9.5 5.2h97.9V381c-31.4-7.6-64.3 4.7-82.7 30.9a75.617 75.617 0 0 0 0 87.1c18.4 26.2 51.3 38.5 82.7 30.9v80.6H121.3V300.2h97.8c3.9 0 7.5-2 9.5-5.2z" fill="#059FFF" p-id="5623"></path><path d="M477.3 858.4c30.4-0.4 54.8-24.8 54.8-54.8 0-29.9-24.4-54.3-54.8-54.8-8.6 0-17 1.9-24.7 5.7-3.5 1.7-7.6 1.5-10.8-0.5-3.3-2-5.3-5.6-5.2-9.4v-96.3h-82c1.5 6 2.3 12.1 2.2 18.3 0 29.6-17.3 56.5-44.5 69.2-27.2 12.7-59.3 8.9-82.6-9.8-23.3-18.7-33.6-48.9-26.5-77.7h-82v310.3h315.2v-96.3c0-3.8 2-7.3 5.2-9.4 3.3-2 7.4-2.2 10.8-0.5 7.9 4.1 16.3 6 24.9 6z" fill="#059FFF" p-id="5624"></path><path d="M666.7 643.3c-2-3.2-2.2-7.2-0.5-10.6 3.8-7.5 5.8-15.9 5.8-24.3-0.5-29.9-25.2-53.9-55.6-53.9-30.4 0-55.2 24-55.6 53.9 0 8.4 2 16.8 5.8 24.3 1.7 3.4 1.5 7.4-0.5 10.6-2 3.2-5.6 5.2-9.5 5.2h-97.8v80.7c6.1-1.5 12.3-2.2 18.5-2.2 42.6 0.5 76.9 34.7 76.9 76.7s-34.3 76.1-76.9 76.7c-6.2 0-12.5-0.7-18.5-2.2v80.7H774V648.5h-97.8c-3.9 0-7.5-1.9-9.5-5.2z" fill="#059FFF" p-id="5625"></path><path d="M537.2 374.5c-0.6 3.8-3 7-6.6 8.5-7.9 3.3-14.9 8.4-20.4 14.9-19.8 23.1-16.8 57.7 6.7 77.2s58.6 16.5 78.4-6.6c5.5-6.4 9.5-14.1 11.5-22.3 0.9-3.7 3.7-6.6 7.4-7.8 3.7-1.2 7.7-0.4 10.6 2l74.8 62.1 52.8-61.7c-26.9-13.1-43.8-40.4-43.3-70s18.3-56.3 45.6-68.5c27.4-12.3 59.5-7.9 82.5 11.2 4.8 4 9.1 8.5 12.7 13.4l52.8-61.7-241-200-203.2 237.2 74.8 62.1c3 2.4 4.4 6.2 3.9 10z" fill="#E6F5FF" p-id="5626"></path></svg>
+        <span>随机一题</span>
+      </div>
+    </div>
+    <!--  题目展示区-->
+    <div class="question-list">
+      <div class="question-list-header question-list-flex">
+        <div>状态</div>
+        <div>题目
+          <svg t="1677668789107" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6644" width="12" height="12"><path d="M158.08 460.8L518.528 0l360.32 460.8M878.848 561.536l-360.384 460.736L158.08 561.536" fill="#7a7a7a" p-id="6645"></path></svg>
+        </div>
+        <div>题解
+          <svg t="1677668789107" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6644" width="12" height="12"><path d="M158.08 460.8L518.528 0l360.32 460.8M878.848 561.536l-360.384 460.736L158.08 561.536" fill="#7a7a7a" p-id="6645"></path></svg>
+        </div>
+        <div>通过率
+          <svg t="1677668789107" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6644" width="12" height="12"><path d="M158.08 460.8L518.528 0l360.32 460.8M878.848 561.536l-360.384 460.736L158.08 561.536" fill="#7a7a7a" p-id="6645"></path></svg>
+        </div>
+        <div>难度
+          <svg t="1677668789107" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6644" width="12" height="12"><path d="M158.08 460.8L518.528 0l360.32 460.8M878.848 561.536l-360.384 460.736L158.08 561.536" fill="#7a7a7a" p-id="6645"></path></svg>
+        </div>
+      </div>
+      <div class="question-list-main question-list-flex">
+        <div>....</div>
+        <div>....</div>
+        <div>....</div>
+        <div>....</div>
+        <div>....</div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  name: "QuestionBank",
+  data () {
+    return {
+      // 标签展开
+      isType: false,
+      // 难度选择
+      difficultyValue: '',
+      difficultyOptions: [
+        {
+          value: '1',
+          label: '简单'
+        },
+        {
+          value: '2',
+          label: '中等'
+        },
+        {
+          value: '3',
+          label: '困难'
+        }
+      ],
+      // 状态选择
+      stateValue: '',
+      stateOptions: [
+        {
+          value: '1',
+          label: '未开始'
+        },
+        {
+          value: '2',
+          label: '已解答'
+        },
+        {
+          value: '3',
+          label: '尝试过'
+        }
+      ],
+      // 标签选择
+      labelValue: []
+    }
+  },
+  mounted () {
+  },
+  methods: {
+    changeTypeShow () {
+      this.isType = !this.isType
+    }
+  }
+}
+</script>
+
+<style lang="scss" scoped>
+.question-bank {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 46px 16px 26px;
+  padding: 16px 0 0 0;
+  border-top: 1px solid #e8e8e8;
+  .function-area {
+    height: 30px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    &>div {
+      margin-right: 8px;
+    }
+    .question-select {
+      position: relative;
+      .select-type {
+        z-index: 9999;
+        position: absolute;
+        width: 300px;
+        top: 41px;
+        left: -102px;
+        height: 300px;
+        transition: all .3s;
+        border: 1px solid #E4E7ED;
+        border-radius: 4px;
+        background-color: #FFF;
+        box-shadow: 0 2px 12px 0 rgb(0 0 0 / 10%);
+        .question-search {
+          margin-top: 16px;
+          input {
+            width: 250px;
+          }
+          i {
+            left: 35px !important;
+          }
+        }
+        .select-type-singles {
+          padding: 20px;
+          display: flex;
+          flex-wrap: wrap;
+          span {
+            background: #e8e8e8;
+            padding: 6px 14px;
+            font-size: 14px;
+            border-radius: 15px;
+            cursor: pointer;
+            margin: 5px 5px 0 0;
+          }
+        }
+      }
+      .fade-enter-active, .fade-leave-active {
+        transition: all .1s ease-out;
+      }
+      .fade-enter, .fade-leave-to /* .fade-leave-active in <2.1.8 */ {
+        opacity: 0
+      }
+      ::v-deep input::-webkit-input-placeholder {
+        color: #595959 !important;
+      }
+      ::v-deep .el-input__inner {
+        height: 30px !important;
+        width: 70px !important;
+        padding: 0 !important;
+        padding-left: 10px !important;
+        border: none !important;
+        background: #e8e8e8;
+      }
+      ::v-deep .el-input__suffix {
+        top: 5px !important;
+      }
+      ::v-deep .is-focus {
+        .el-input__suffix {
+          top: -5px !important;
+        }
+      }
+    }
+    .question-search {
+      position: relative;
+      i {
+        left: 12px;
+        top: 5px;
+        font-size: 18px;
+        color: #696969;
+        font-weight: bold;
+        position: absolute;
+      }
+      input {
+        box-sizing: border-box;
+        width: 200px;
+        height: 30px;
+        border-radius: 5px;
+        border: none;
+        outline-style: none;
+        background: #e8e8e8;
+        padding: 0 10px 0 36px;
+      }
+    }
+    .question-refresh {
+      text-align: center;
+      line-height: 30px;
+      &:hover {
+        color: #3d9eff;
+        cursor: pointer;
+      }
+    }
+    .question-random {
+      cursor: pointer;
+      display: flex;
+      margin-left: 15px;
+      justify-content: center;
+      align-items: center;
+      padding: 5px;
+      border-radius: 5px;
+      transition: all .2s;
+      &:hover {
+        background: #e8e8e8;
+        color: #059fff;
+      }
+      span {
+        margin-left: 8px;
+        font-size: 14px;
+      }
+    }
+  }
+  .question-list {
+    width: 100%;
+    margin-top: 10px;
+    //border-top: 1px solid #e8e8e8;
+    padding: 10px 0 0 0;
+    .question-list-flex {
+      width: 100%;
+      height: 45px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      // 状态
+      &>div:nth-child(1) {
+        width: 60px;
+      }
+      // 题目
+      &>div:nth-child(2) {
+        flex: 1;
+      }
+      // 题解
+      &>div:nth-child(3) {
+        width: 100px;
+      }
+      // 通过率
+      &>div:nth-child(4) {
+        width: 100px;
+      }
+      // 难度
+      &>div:nth-child(5) {
+        width: 80px;
+      }
+    }
+    .question-list-header {
+      border-bottom: 1px solid #e8e8e8;
+      color: #7a7a7a;
+      font-size: 14px;
+      &>div {
+        position: relative;
+        svg {
+          position: absolute;
+          right: 10px;
+          top: 4px;
+        }
+        &:hover {
+          svg {
+            color: #3b3b3b !important;
+          }
+        }
+      }
+      // 题目
+      &>div:nth-child(2) {
+        cursor: pointer;
+        &:hover {
+          color: #3b3b3b;
+        }
+      }
+      // 题解
+      &>div:nth-child(3) {
+        cursor: pointer;
+        &:hover {
+          color: #3b3b3b;
+        }
+      }
+      // 通过率
+      &>div:nth-child(4) {
+        cursor: pointer;
+        &:hover {
+          color: #3b3b3b;
+        }
+      }
+      // 难度
+      &>div:nth-child(5) {
+        cursor: pointer;
+        &:hover {
+          color: #3b3b3b;
+        }
+      }
+    }
+  }
+}
+</style>

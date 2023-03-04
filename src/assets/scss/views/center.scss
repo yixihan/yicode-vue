@@ -1,0 +1,30 @@
+
+.center {
+  padding-top: 70px;
+  width: 70vw;
+  max-width: 1280px;
+  min-width: 920px;
+  //height: 800px;
+  background: #ffffff;
+  display: flex;
+  //justify-content: center;
+  //align-items: center;
+
+  .center_left {
+    flex-grow: 1;
+    max-width: 200px;
+    //height: 800px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .center_right {
+    flex: 1;
+    min-width: 500px;
+    //height: 800px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+}

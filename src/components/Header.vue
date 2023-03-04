@@ -1,7 +1,7 @@
 <template>
   <div class="nav">
     <ul>
-      <li class="logo"></li>
+      <li class="logo" @click="toIndex"></li>
       <li class="col">题库</li>
       <li class="col">题单</li>
 
@@ -14,7 +14,7 @@
         <i class="el-icon-bell"></i>
       </li>
       <li class="col" v-if="isAdmin" @click="toAdminCenter">
-        <i class="">管理中心</i>
+        <i class="el-icon-user-solid">管理中心</i>
       </li>
       <li class="col" v-if="isLogin" @click="toUserCenter">
         <i class="el-icon-user">个人中心</i>
@@ -32,6 +32,10 @@ export default {
     };
   },
   methods: {
+    // 跳转到首页
+    toIndex() {
+      this.$router.push("/");
+    },
     // 跳转到登录页面
     toLogin() {
       // this.isLogin = true

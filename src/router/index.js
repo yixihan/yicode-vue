@@ -42,7 +42,34 @@ const routes = [
       {
         path: "/admin/center",
         name: "AdminCenter",
-        component: () => import("../views/adminCenter/AdminCenter.vue")
+        component: () => import("../views/adminCenter/AdminCenter.vue"),
+        children: [
+          {
+            path: "/admin/center",
+            name: "AdminIndex",
+            component: () => import("@/views/adminCenter/Index.vue")
+          },
+          {
+            path: "/admin/center/problem",
+            name: "AdminProblem",
+            component: () => import("@/views/adminCenter/Problem.vue")
+          },
+          {
+            path: "/admin/center/note",
+            name: "AdminNote",
+            component: () => import("@/views/adminCenter/Note.vue")
+          },
+          {
+            path: "/admin/center/label",
+            name: "AdminLabel",
+            component: () => import("@/views/adminCenter/Label.vue")
+          },
+          {
+            path: "/admin/center/user",
+            name: "AdminUser",
+            component: () => import("@/views/adminCenter/User.vue")
+          },
+        ]
       }
     ]
   },
