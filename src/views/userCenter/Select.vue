@@ -1,13 +1,10 @@
 <template>
-
-  <div>
-    <h1>题解管理页</h1>
-  </div>
+  <div class="select">222</div>
 </template>
 
 <script>
 export default {
-  name: "AdminNote"
+  name: "Select"
 }
 </script>
 

@@ -204,8 +204,8 @@ export default {
         errorMsg("邮箱不符合输入规范!")
         return
       }
-      this.asyncSendEmail().then(({data}) => {
-        successMsg(data.data.message)
+      this.asyncSendEmail().then(() => {
+        successMsg("邮件发送成功!")
       })
     },
     // 校验邮箱验证码
@@ -230,8 +230,8 @@ export default {
         errorMsg("邮箱不符合输入规范!")
         return
       }
-      this.asyncSendMobile().then(({data}) => {
-        successMsg(data.data.message)
+      this.asyncSendMobile().then(() => {
+        successMsg("短信发送成功!")
       })
     },
     // 校验短信验证码
@@ -377,7 +377,7 @@ export default {
         responseType: "blob"
       })
     },
-    // 异步方法 => 获取图片验证码
+    // 异步方法 => 校验图片验证码
     async asyncValidatePhotoCode() {
       return await this.$axios({
         url: "/yicode-thirdpart-openapi/open/code/validate",

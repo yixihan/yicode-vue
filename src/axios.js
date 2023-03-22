@@ -44,9 +44,9 @@ axios.interceptors.response.use(
       return response
     }
     // console.log(res)
-    if (res.code === 200) {
+    if (res.code === 200 || res === '') {
       return response
-    }  else {
+    } else {
       errorMsg(res.message)
       // 返回一个异常提示就不会继续往下走了 不+的话 res=>的里面 还是会继续走的
       return Promise.reject(response.data.msg)

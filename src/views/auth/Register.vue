@@ -116,9 +116,8 @@ export default {
         return;
       }
 
-      promise.then(({data}) => {
-        console.log(data)
-        successMsg(data.data.message)
+      promise.then(() => {
+        successMsg("注册成功")
         // 跳转到登录页面
         this.$router.push("/login")
       })
@@ -170,8 +169,8 @@ export default {
         errorMsg("邮箱不符合输入规范!")
         return
       }
-      this.asyncSendEmail().then(({data}) => {
-        successMsg(data.data.message)
+      this.asyncSendEmail().then(() => {
+        successMsg("邮件发送成功!")
       })
     },
     // 校验邮箱验证码
@@ -193,11 +192,11 @@ export default {
     sendMobileCode() {
       // 校验输入
       if (!validate.validateMobile(this.user.mobile)) {
-        errorMsg("邮箱不符合输入规范!")
+        errorMsg("手机号不符合输入规范!")
         return
       }
-      this.asyncSendMobile().then(({data}) => {
-        successMsg(data.data.message)
+      this.asyncSendMobile().then(() => {
+        successMsg("短信发送成功!")
       })
     },
     // 校验短信验证码

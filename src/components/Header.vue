@@ -2,8 +2,7 @@
   <div class="nav">
     <ul>
       <li class="logo" @click="toIndex"></li>
-      <li class="col">题库</li>
-      <li class="col">题单</li>
+      <li class="col" @click="toQuestionLibrary">题库</li>
 
       <li class="col bank"></li>
 
@@ -49,8 +48,13 @@ export default {
     toUserCenter() {
       this.$router.push("/userCenter/center/" + this.$store.getters.getUserId)
     },
+    // 跳转到管理中心
     toAdminCenter() {
       this.$router.push("/admin/center")
+    },
+    // 跳转到题库
+    toQuestionLibrary () {
+      this.$router.push("/questionLibrary")
     },
     // 退出登录
     logout() {

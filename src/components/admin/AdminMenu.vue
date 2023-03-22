@@ -20,9 +20,9 @@
           <i class="el-icon-s-platform"></i>
           <span slot="title">题目管理</span>
         </el-menu-item>
-        <el-menu-item index="/admin/center/note">
+        <el-menu-item index="/admin/center/list">
           <i class="el-icon-notebook-2"></i>
-          <span slot="title">题解管理</span>
+          <span slot="title">题单管理</span>
         </el-menu-item>
         <el-menu-item index="/admin/center/label">
           <i class="el-icon-collection-tag"></i>

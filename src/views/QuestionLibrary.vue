@@ -1,117 +1,24 @@
 <template>
-  <div>
-    <!-- 搜索方法, 搜索选项 : 难度,标签,题目 -->
-    <div>
-
-    </div>
-    <div>
-      <!--　内容展示 -->
-      <div>
-        <el-table
-            :data="data.records"
-            style="width: 100%"
-            :stripe="true"
-            :border="true"
-            size="small"
-            border>
-          <el-table-column
-              prop="questionName"
-              label="问题名称"
-              width="180"
-              fixed>
-          </el-table-column>
-          <el-table-column
-              prop="questionDifficulty"
-              label="问题难度"
-              width="100"
-              sortable
-              fit>
-          </el-table-column>
-          <el-table-column
-              prop="likeCount"
-              label="点赞数"
-              width="90"
-              sortable
-              fit>
-          </el-table-column>
-          <el-table-column
-              prop="commitCount"
-              label="提交数"
-              width="90"
-              sortable
-              fit>
-          </el-table-column>
-          <el-table-column
-              prop="successCount"
-              label="通过数"
-              width="90"
-              sortable
-              fit>
-          </el-table-column>
-          <el-table-column
-              prop="noteCount"
-              label="题解数"
-              width="90"
-              sortable
-              fit>
-          </el-table-column>
-          <el-table-column
-              prop="commentCount"
-              label="评论数"
-              width="90"
-              sortable
-              fit>
-          </el-table-column>
-          <el-table-column
-              prop="passRate"
-              label="通过率"
-              width="90"
-              sortable
-              fit>
-          </el-table-column>
-          <el-table-column
-              prop="createTime"
-              label="创建时间"
-              width="140"
-              fit>
-          </el-table-column>
-          <el-table-column
-              fixed="right"
-              label="操作"
-              width="90">
-            <template v-slot="scope">
-              <el-button type="text" size="small" @click="toQuestionInfo(scope.$index)">查看</el-button>
-              <!-- 按钮变为红色 -->
-              <el-button type="text" size="small">删除</el-button>
-            </template>
-          </el-table-column>
-        </el-table>
-      </div>
-      <!-- 分页插件 -->
-      <div>
-        <el-pagination
-            @size-change="handleSizeChange"
-            @current-change="handleCurrentChange"
-            :hide-on-single-page="hide"
-            :current-page="data.current"
-            :page-sizes="[10, 20, 30, 40, 50]"
-            :page-size="data.size"
-            :total="data.total"
-            layout="total, sizes, prev, pager, next, jumper"
-        >
-        </el-pagination>
-      </div>
-    </div>
+  <div class="question-library">
+    <question-library-list @changeList="$event => id = $event"></question-library-list>
+    <question-bank :type="type" :page="page" :id="id">
+    </question-bank>
   </div>
 </template>
 
 <script>
+import QuestionLibraryList from "@/components/QuestionLibrary/QuestionLibraryList.vue";
+import QuestionBank from "@/components/index/QuestionBank.vue";
 
 export default {
-  name: "Pagination",
+  name: "QuestionLibrary",
+  components: {QuestionBank, QuestionLibraryList},
   data() {
     return {
       hide: false,
+      page: 1,
+      type: 'QUESTION',
+      id: 0,
       "data": {
         "current": 1,
         "total": 1001,
@@ -244,22 +151,14 @@ export default {
   }
   ,
   methods: {
-    handleSizeChange(val) {
-      console.log(`每页 ${val} 条`);
-    }
-    ,
-    handleCurrentChange(val) {
-      console.log(`当前页: ${val}`);
+    // 切换题目展示类型
+    changeshowType () {
     },
-    // 题目详情
-    toQuestionInfo (index) {
-      console.log(index)
-      this.$router.push({path: '/admin/center/detail', query: {id: this.data.records[index].questionId}})
-    }
   }
 }
 </script>
 
 <style lang="scss" scoped>
+@import "@/assets/scss/views/questionLibrary.scss";
 
 </style>

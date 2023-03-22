@@ -1,12 +1,12 @@
 <template>
   <div class="index">
     <div class="index_left">
-    <!--      左侧组件-->
+      <!-- 左侧组件 -->
       <Carousel></Carousel>
-      <question-bank></question-bank>
+      <question-bank :type="type" :page="page"></question-bank>
     </div>
     <div class="index_right">
-    <!--      右侧组件-->
+      <!--  右侧组件 -->
       <speed-progress></speed-progress>
       <calendar></calendar>
     </div>
@@ -21,7 +21,13 @@ import Calendar from "@/components/index/Calendar.vue";
 
 export default {
   name: "index",
-  components: {Calendar, SpeedProgress, QuestionBank, Carousel}
+  components: {Calendar, SpeedProgress, QuestionBank, Carousel},
+  data() {
+    return {
+      page: 1,
+      type: 'MAIN'
+    }
+  }
 }
 </script>
 

@@ -83,14 +83,14 @@ export default {
 
       if (validate.validateEmail(this.user.mobileOrEmail)) {
         // 如果是邮箱
-        this.asyncResetPasswordByEmail().then(({data}) => {
-          successMsg(data.data.message)
+        this.asyncResetPasswordByEmail().then(() => {
+          successMsg("密码重置成功")
           this.$router.push("/login")
         })
       } else if (validate.validateMobile(this.user.mobileOrEmail)) {
         // 如果是手机号
-        this.asyncResetPasswordByMobile().then(({data}) => {
-          successMsg(data.data.message)
+        this.asyncResetPasswordByMobile().then(() => {
+          successMsg("密码重置成功")
           this.$router.push("/login")
         });
       } else {
@@ -101,13 +101,13 @@ export default {
     sendCode() {
       if (validate.validateEmail(this.user.mobileOrEmail)) {
         // 如果是邮箱
-        this.asyncSendEmail().then(({data}) => {
-          successMsg(data.data.message)
+        this.asyncSendEmail().then(() => {
+          successMsg("邮件发送成功!")
         })
       } else if (validate.validateMobile(this.user.mobileOrEmail)) {
         // 如果是手机号
-        this.asyncSendMobile().then(({data}) => {
-          successMsg(data.data.message)
+        this.asyncSendMobile().then(() => {
+          successMsg("短信发送成功!")
         });
       } else {
         errorMsg("输入错误!");
@@ -134,14 +134,14 @@ export default {
 
       if (validate.validateEmail(this.user.mobileOrEmail)) {
         // 如果是邮箱
-        this.asyncValidateEmailCode().then(({data}) => {
-          successMsg(data.data.message)
+        this.asyncValidateEmailCode().then(() => {
+          successMsg("账户校验成功!")
           this.activeStep = 2
         })
       } else {
         // 如果是手机号
-        this.asyncValidateMobileCode().then(({data}) => {
-          successMsg(data.data.message)
+        this.asyncValidateMobileCode().then(() => {
+          successMsg("账户校验成功!")
           this.activeStep = 2
         });
       }
