@@ -27,6 +27,17 @@ export default new Vuex.Store({
     },
     getUserRoleList: state => {
       return state.userRoleList
+    },
+    isAdmin: state => {
+      return state.userRoleList !== null
+        && state.userRoleList !== ""
+        && state.userRoleList !== []
+        && state.userRoleList
+          .some(item => item.roleName !== "USER")
+    },
+    isLogin: state => {
+      return state.accessToken !== null
+        && state.accessToken !== ''
     }
   },
   mutations: {

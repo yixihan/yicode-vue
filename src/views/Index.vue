@@ -2,13 +2,14 @@
   <div class="index">
     <div class="index_left">
       <!-- 左侧组件 -->
-      <Carousel></Carousel>
-      <question-bank :type="type" :page="page"></question-bank>
+      <Carousel/>
+      <question-bank :type="type"
+                     :page="page"/>
     </div>
     <div class="index_right">
       <!--  右侧组件 -->
-      <speed-progress></speed-progress>
-      <calendar></calendar>
+      <speed-progress/>
+      <calendar/>
     </div>
   </div>
 </template>

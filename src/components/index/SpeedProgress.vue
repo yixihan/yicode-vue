@@ -41,20 +41,20 @@ export default {
       isPercentage: false,
       // 问题数量情况
       questionCount: {
-        "question": '',
-        "hardQuestion": '',
-        "mediumQuestion": '',
-        "easyQuestion": ''
+        "question": 0,
+        "hardQuestion": 0,
+        "mediumQuestion": 0,
+        "easyQuestion": 0
       },
       // 用户做题进度
       userRate: {
-        "acceptedQuestion": '',
-        "acceptedHardQuestion": '',
-        "acceptedMediumQuestion": '',
-        "unAcceptedQuestion": "",
-        "unDoQuestion": "",
-        "acceptedEasyQuestion": '',
-        "acceptedQuestionRate": '',
+        "acceptedQuestion": 0,
+        "acceptedHardQuestion": 0,
+        "acceptedMediumQuestion": 0,
+        "unAcceptedQuestion": 0,
+        "unDoQuestion": 0,
+        "acceptedEasyQuestion": 0,
+        "acceptedQuestionRate": 0,
       }
     }
   },
@@ -99,8 +99,10 @@ export default {
                 name: '困难'
               },
               {
-                value: this.userRate.unAcceptedQuestion +
-                    this.userRate.unDoQuestion,
+                value: this.$store.getters.isLogin ?
+                    this.userRate.unAcceptedQuestion +
+                    this.userRate.unDoQuestion :
+                    this.questionCount.question,
                 name: '剩余'
               }
             ],
@@ -124,12 +126,14 @@ export default {
           resolve()
         })
       }))
-      promiseArr.push(new Promise((resolve) => {
-        this.asyncGetUserQuestionRate().then(({data}) => {
-          this.userRate = data.data
-          resolve()
-        })
-      }))
+      if (this.$store.getters.isLogin) {
+        promiseArr.push(new Promise((resolve) => {
+          this.asyncGetUserQuestionRate().then(({data}) => {
+            this.userRate = data.data
+            resolve()
+          })
+        }))
+      }
 
       Promise.all(promiseArr).then(() => {
         this.initCharts()

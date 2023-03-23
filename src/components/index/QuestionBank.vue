@@ -10,9 +10,9 @@
               :key="item.value"
               :label="item.label"
               :value="item.value">
-            <span style="float: left; color: #00af9b;" v-if="item.value === '1'">{{ item.label }}</span>
-            <span style="float: left; color: #ffb800;" v-if="item.value === '2'">{{ item.label }}</span>
-            <span style="float: left; color: #ff2d55;" v-if="item.value === '3'">{{ item.label }}</span>
+            <span style="float: left; color: #00af9b;" v-if="item.value === 'EASY'">{{ item.label }}</span>
+            <span style="float: left; color: #ffb800;" v-if="item.value === 'MEDIUM'">{{ item.label }}</span>
+            <span style="float: left; color: #ff2d55;" v-if="item.value === 'HARD'">{{ item.label }}</span>
           </el-option>
         </el-select>
       </div>
@@ -29,7 +29,11 @@
       </div>
       <!-- 标签 -->
       <div class="question-select">
-        <el-select v-model="labelValue" placeholder="标签" @click.native="changeTypeShow()">
+        <el-select value-key="Set"
+                   value="标签"
+                   placeholder="标签"
+                   @click.native="changeTypeShow()">
+          <div slot="empty"></div>
         </el-select>
         <transition name="fade">
           <div class="select-type" v-show="isType">
@@ -38,11 +42,13 @@
               <input type="text"/>
             </div>
             <div class="select-type-singles">
-              <span>数组</span>
-              <span>字符串</span>
-              <span>动态规划</span>
-              <span>深度优先搜索</span>
-              <span>数组</span>
+              <div v-show="refreshLabel">
+                <span v-for="(item, index) in labelOptions"
+                      :key="index"
+                      :style="item.flag ? chooseLabelStyle : unChooseLabelStyle"
+                      @click="chooseLabel(item)">{{ item.labelName }}
+                </span>
+              </div>
             </div>
           </div>
         </transition>
@@ -50,14 +56,14 @@
       <!-- 搜索框 -->
       <div class="question-search">
         <i class="el-icon-search"></i>
-        <input type="text"/>
+        <input type="text" v-model="nameValue"/>
       </div>
       <!-- 重置 -->
-      <div class="question-refresh">
+      <div class="question-refresh" @click="resetReq">
         <i class="el-icon-refresh-right">重置</i>
       </div>
       <!-- 随机一题 -->
-      <div class="question-random">
+      <div class="question-random" @click="randomQuestion">
         <svg t="1677667359052" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
              p-id="5622" width="30" height="30">
           <path
@@ -134,12 +140,13 @@
         <div>{{ item.commitCount }}</div>
         <div>{{ item.successCount }}</div>
         <div>{{ item.noteCount }}</div>
-        <div>{{ item.passRate }}</div>
-        <div :style="'color: ' + getColor(item.questionDifficulty)">
+        <div>{{ item.passRate }}%</div>
+        <div :style="'color: ' + getDifficultyColor(item.questionDifficulty)">
           {{ item.questionDifficulty }}
         </div>
       </div>
     </div>
+    <!-- 分页组件 -->
     <div class="paging" v-if="type !== 'MAIN'">
       <el-pagination
           @size-change="handleSizeChange"
@@ -180,15 +187,18 @@ export default {
       hide: false,
       // 标签展开
       isType: false,
+      // 刷新标签
+      refreshLabel: true,
       // 难度选择
       difficultyValue: '',
+      // 难度选项
       difficultyOptions: [
         {
           value: 'EASY',
           label: '简单'
         },
         {
-          value: '2',
+          value: 'MEDIUM',
           label: '中等'
         },
         {
@@ -198,22 +208,41 @@ export default {
       ],
       // 状态选择
       stateValue: '',
+      // 状态选项
       stateOptions: [
         {
-          value: '1',
+          value: 'UN_DO',
           label: '未开始'
         },
         {
-          value: '2',
-          label: '已解答'
+          value: 'ACCESS',
+          label: '已通过'
         },
         {
-          value: '3',
-          label: '尝试过'
+          value: 'UN_ACCESS',
+          label: '未通过'
         }
       ],
       // 标签选择
-      labelValue: [],
+      labelValue: new Set(),
+      // 可选标签
+      labelOptions: [
+        {
+          "flag": false,
+          "labelId": '',
+          "labelName": ""
+        }
+      ],
+      chooseLabelStyle: {
+        background: '#007aff',
+        userSelect: 'none'
+      },
+      unChooseLabelStyle:{
+        background: '#e5e6e8',
+        userSelect: 'none'
+      },
+      // 题目选择
+      nameValue: '',
       // 可选的
       pageSize: 10,
       // 可选的每页展示数据量
@@ -243,6 +272,7 @@ export default {
   },
   mounted() {
     this.getQuestionDetails()
+    this.getQuestionLabel()
   },
   methods: {
     // 题目数据获取
@@ -292,7 +322,7 @@ export default {
       this.isType = !this.isType
     },
     // 设置题目难度颜色
-    getColor(questionDifficulty) {
+    getDifficultyColor(questionDifficulty) {
       if (questionDifficulty === '困难') {
         return '#ff2d55'
       } else if (questionDifficulty === '中等') {
@@ -300,6 +330,26 @@ export default {
       } else {
         return "#00af9b"
       }
+    },
+    // 重置搜索选项
+    resetReq() {
+      this.difficultyValue = '';
+      this.labelValue = new Set();
+      this.stateValue = '';
+      this.nameValue = '';
+    },
+    // 选择标签
+    chooseLabel(item) {
+      if (this.labelValue.has(item.labelId)) {
+        this.labelValue.delete(item.labelId)
+        item.flag = false
+      } else {
+        this.labelValue.add(item.labelId)
+        item.flag = true
+      }
+      this.refreshLabel = false
+      this.refreshLabel = true
+      this.getQuestionDetails()
     },
     // 切换每页展示数量
     handleSizeChange(val) {
@@ -311,11 +361,27 @@ export default {
       this.data.current = val
       this.getQuestionDetails()
     },
+    // 随机一题
+    randomQuestion() {
+      this.asyncRandomQuestion().then(({data}) => {
+        this.toQuestionInfo(data.data.questionId)
+      })
+    },
+    // 获取问题标签
+    getQuestionLabel() {
+      this.asyncGetQuestionLabel().then(({data}) => {
+        this.labelOptions = data.data
+        this.labelOptions.forEach((item) => {
+          item.flag = false
+        })
+      })
+    },
 
     // 跳转题目详情
     toQuestionInfo(index) {
       console.log(index)
-      this.$router.push({path: '/admin/center/detail', query: {id: this.data.records[index].questionId}})
+      // TODO 跳转题目详情
+      // this.$router.push({path: '/admin/center/detail', query: {id: this.data.records[index].questionId}})
     },
     // 异步方法 => 获取题目列表
     async asyncGetQuestion(paging) {
@@ -325,7 +391,11 @@ export default {
         data: {
           "pageSize": paging.pageSize,
           "searchCount": paging.searchCount,
-          "page": paging.page
+          "page": paging.page,
+          "questionName": this.nameValue,
+          "difficulty": this.difficultyValue,
+          "status": this.stateValue,
+          "label": Array.from(this.labelValue.values())
         }
       });
     },
@@ -341,7 +411,22 @@ export default {
           "page": paging.page
         }
       });
+    },
+    // 异步方法 => 获取题单题目列表
+    async asyncGetQuestionLabel() {
+      return await this.$axios({
+        url: "/yicode-question-openapi/open/label/all/question",
+        method: "get",
+      });
+    },
+    // 异步方法 => 获取题单题目列表
+    async asyncRandomQuestion() {
+      return await this.$axios({
+        url: "/yicode-question-openapi/open/question/detail/random",
+        method: "get",
+      });
     }
+
   }
 }
 </script>
@@ -519,7 +604,7 @@ export default {
 
       // 状态
       & > div:nth-child(1) {
-        width: 60px;
+        width: 40px;
       }
 
       // 题目
@@ -529,27 +614,27 @@ export default {
 
       // 点赞数
       & > div:nth-child(3) {
-        width: 100px;
+        width: 80px;
       }
 
       // 提交数
       & > div:nth-child(4) {
-        width: 100px;
+        width: 80px;
       }
 
       // 通过数
       & > div:nth-child(5) {
-        width: 100px;
+        width: 80px;
       }
 
       // 题解
       & > div:nth-child(6) {
-        width: 100px;
+        width: 80px;
       }
 
       // 通过率
       & > div:nth-child(7) {
-        width: 100px;
+        width: 80px;
       }
 
       // 难度
