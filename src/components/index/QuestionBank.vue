@@ -4,7 +4,7 @@
     <div class="function-area">
       <!-- 难度 -->
       <div class="question-select">
-        <el-select v-model="difficultyValue" placeholder="难度">
+        <el-select v-model="difficultyValue" placeholder="难度" @change="chooseDifficulty">
           <el-option
               v-for="item in difficultyOptions"
               :key="item.value"
@@ -18,11 +18,12 @@
       </div>
       <!-- 状态 -->
       <div class="question-select">
-        <el-select placeholder="状态" v-model="stateValue">
+        <el-select placeholder="状态" v-model="stateValue" @change="chooseStatus">
           <el-option
               v-for="item in stateOptions"
               :key="item.value"
               :label="item.label"
+              @click="getQuestionDetails"
               :value="item.value">
           </el-option>
         </el-select>
@@ -39,7 +40,7 @@
           <div class="select-type" v-show="isType">
             <div class="question-search">
               <i class="el-icon-search"></i>
-              <input type="text"/>
+              <input v-model="labelName" type="text"/>
             </div>
             <div class="select-type-singles">
               <div v-show="refreshLabel">
@@ -56,7 +57,7 @@
       <!-- 搜索框 -->
       <div class="question-search">
         <i class="el-icon-search"></i>
-        <input type="text" v-model="nameValue"/>
+        <input type="text" v-model="nameValue" @keyup.enter="getQuestionDetails"/>
       </div>
       <!-- 重置 -->
       <div class="question-refresh" @click="resetReq">
@@ -223,6 +224,8 @@ export default {
           label: '未通过'
         }
       ],
+      // 输入标签
+      labelName: '',
       // 标签选择
       labelValue: new Set(),
       // 可选标签
@@ -233,10 +236,12 @@ export default {
           "labelName": ""
         }
       ],
+      // 选择标签时展示的 style
       chooseLabelStyle: {
         background: '#007aff',
         userSelect: 'none'
       },
+      // 未选择标签时展示的 style
       unChooseLabelStyle:{
         background: '#e5e6e8',
         userSelect: 'none'
@@ -275,6 +280,20 @@ export default {
     this.getQuestionLabel()
   },
   methods: {
+    // 切换标签展示类型
+    changeTypeShow() {
+      this.isType = !this.isType
+    },
+    // 设置题目难度颜色
+    getDifficultyColor(questionDifficulty) {
+      if (questionDifficulty === '困难') {
+        return '#ff2d55'
+      } else if (questionDifficulty === '中等') {
+        return "#ffb800"
+      } else {
+        return "#00af9b"
+      }
+    },
     // 题目数据获取
     getQuestionDetails() {
       // 分页参数
@@ -304,6 +323,9 @@ export default {
         }
         this.asyncGetQuestion(pagingReq).then(({data}) => {
           this.data = data.data
+          if (this.data.total <= this.data.size) {
+            this.hide = true;
+          }
         })
       } else if (this.type === 'QUESTION_LIST') {
         // 题单
@@ -314,21 +336,10 @@ export default {
         }
         this.asyncGetQuestionList(pagingReq).then(({data}) => {
           this.data = data.data
+          if (this.data.total <= this.data.size) {
+            this.hide = true;
+          }
         })
-      }
-    },
-    // 切换标签展示类型
-    changeTypeShow() {
-      this.isType = !this.isType
-    },
-    // 设置题目难度颜色
-    getDifficultyColor(questionDifficulty) {
-      if (questionDifficulty === '困难') {
-        return '#ff2d55'
-      } else if (questionDifficulty === '中等') {
-        return "#ffb800"
-      } else {
-        return "#00af9b"
       }
     },
     // 重置搜索选项
@@ -337,6 +348,18 @@ export default {
       this.labelValue = new Set();
       this.stateValue = '';
       this.nameValue = '';
+      this.getQuestionLabel();
+      this.getQuestionDetails();
+    },
+    // 选择难度
+    chooseDifficulty(val) {
+      this.difficultyValue = val;
+      this.getQuestionDetails()
+    },
+    // 选择状态
+    chooseStatus(val) {
+      this.stateValue = val;
+      this.getQuestionDetails()
     },
     // 选择标签
     chooseLabel(item) {
@@ -369,7 +392,7 @@ export default {
     },
     // 获取问题标签
     getQuestionLabel() {
-      this.asyncGetQuestionLabel().then(({data}) => {
+      this.asyncGetQuestionLabel(this.labelName).then(({data}) => {
         this.labelOptions = data.data
         this.labelOptions.forEach((item) => {
           item.flag = false
@@ -412,14 +435,14 @@ export default {
         }
       });
     },
-    // 异步方法 => 获取题单题目列表
-    async asyncGetQuestionLabel() {
+    // 异步方法 => 获取所有题目标签
+    async asyncGetQuestionLabel(labelName) {
       return await this.$axios({
-        url: "/yicode-question-openapi/open/label/all/question",
+        url: "/yicode-question-openapi/open/label/all/question?labelName=" + labelName,
         method: "get",
       });
     },
-    // 异步方法 => 获取题单题目列表
+    // 异步方法 => 随机一题
     async asyncRandomQuestion() {
       return await this.$axios({
         url: "/yicode-question-openapi/open/question/detail/random",

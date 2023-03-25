@@ -65,8 +65,9 @@ export default {
     // 数据刷新
     freshData() {
       this.getDailyQuestion(this.chooseMonth)
-      // TODO 未登录不获取值
-      this.getUserDailyQuestionDetail(this.chooseMonth)
+      if (this.$store.getters.isLogin) {
+        this.getUserDailyQuestionDetail(this.chooseMonth)
+      }
     },
     // 获取每日一题题目列表
     getDailyQuestion(month) {
