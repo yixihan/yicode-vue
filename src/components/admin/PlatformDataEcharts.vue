@@ -7,14 +7,32 @@
 <script>
 export default {
   name: "PlatformDataEcharts",
+  data () {
+    return {
+      data: [
+        {
+          "month": "",
+          "commitCount": 0,
+          "commitSuccessCount": 0,
+          "noteCount": 0,
+          "commentCount": 0,
+          "userCount": 0
+        }
+      ],
+      monthData: [],
+      commitCountData: [],
+      commitSuccessCountData: [],
+      noteCountData: [],
+      commentCountData: [],
+      userCountData: [],
+    }
+  },
   mounted() {
-    this.drawLine();
+    this.getPlatformData();
   },
   methods: {
+    // 渲染折线图
     drawLine() {
-      // 三种统计维度 : 天(14天), 周(12周), 月(12月)
-      // 保存为图片,去掉
-      // 悬停出现的内容顺序最好和图上的顺序一致,能弄就弄
       // 基于准备好的dom，初始化echarts实例
       let problem = this.$echarts.init(document.getElementById('platform'))
       // 绘制图表
@@ -43,7 +61,7 @@ export default {
         xAxis: {
           type: 'category',
           boundaryGap: false,
-          data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+          data: this.monthData
         },
         yAxis: {
           type: 'value'
@@ -53,33 +71,62 @@ export default {
             name: '代码提交数',
             type: 'line',
             stack: 'Total',
-            data: [120, 132, 101, 134, 90, 230, 210]
+            data: this.commitCountData
           },
           {
             name: '提交通过数',
             type: 'line',
             stack: 'Total',
-            data: [220, 182, 191, 234, 290, 330, 310]
+            data: this.commitSuccessCountData
           },
           {
             name: '新增题解数',
             type: 'line',
             stack: 'Total',
-            data: [150, 232, 201, 154, 190, 330, 410]
+            data: this.noteCountData
           },
           {
             name: '新增评论数',
             type: 'line',
             stack: 'Total',
-            data: [320, 332, 301, 334, 390, 330, 320]
+            data: this.commentCountData
           },
           {
             name: '新增用户数',
             type: 'line',
             stack: 'Total',
-            data: [820, 932, 901, 934, 1290, 1330, 1320]
+            data: this.userCountData
           }
         ]
+      });
+    },
+    // 获取平台活跃数据
+    getPlatformData() {
+      this.asyncGetPlatformData().then(({data}) => {
+        this.data = data.data
+        this.dealData(data.data)
+        this.drawLine();
+      })
+    },
+    // 数据处理
+    dealData(data) {
+      data.forEach(item => {
+        this.monthData.push(item.month)
+        this.commitCountData.push(item.commitCount)
+        this.commitSuccessCountData.push(item.commitSuccessCount)
+        this.noteCountData.push(item.noteCount)
+        this.commentCountData.push(item.commentCount)
+        this.userCountData.push(item.userCount)
+      })
+    },
+    // 异步方法 => 获取平台活跃数据
+    async asyncGetPlatformData() {
+      return await this.$axios({
+        url: "/yicode-question-openapi/open/admin/broken/data",
+        method: "post",
+        data: {
+          "dateDimension": 'YEAR'
+        }
       });
     }
   }
