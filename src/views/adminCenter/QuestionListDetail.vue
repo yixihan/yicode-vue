@@ -1,7 +1,8 @@
 <template>
   <div class="question-list-detail">
+    <!-- 顶部功能区 -->
     <div class="func">
-      <h2>题目名称</h2>
+      <h2>{{ questionListForm.questionListName }}</h2>
       <div class="back" @click="goBack()">
         <i class="el-icon-arrow-left"></i>
         <span>返回</span>
@@ -10,27 +11,28 @@
       <i class="el-icon-plus" @click="isShowAddQues = true"></i>
       <i class="el-icon-delete-solid" @click="isShowDelQues = true"></i>
     </div>
+    <!-- 题目数据展示 -->
     <el-table
-        :data="tableData"
+        :data="questionData.records"
         border
         style="width: 100%">
       <el-table-column
           fixed
-          prop="id"
+          prop="questionId"
           label="题目id">
       </el-table-column>
       <el-table-column
-          prop="name"
+          prop="questionName"
           label="题目名称">
       </el-table-column>
       <el-table-column
-          prop="difficulty"
+          prop="questionDifficulty"
           label="难度"
-         >
+      >
       </el-table-column>
       <el-table-column
-          prop="time"
-          label="加入时间">
+          prop="passRate"
+          label="通过率">
       </el-table-column>
       <el-table-column
           fixed="right"
@@ -38,16 +40,29 @@
           width="100">
         <template slot-scope="scope">
           <el-button type="text" size="small">查看</el-button>
-          <el-button type="text" size="small">编辑</el-button>
+          <el-button type="text"
+                     size="small"
+                     style="color: red"
+                     @click="delQuestion(scope.row.questionId)"
+          >删除
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
+    <!-- 分页插件 -->
     <div class="block">
       <el-pagination
-          layout="prev, pager, next"
-          :total="1000">
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+          :hide-on-single-page="false"
+          :current-page="questionData.current"
+          :page-sizes="[10, 20, 30, 40, 50]"
+          :page-size="questionData.size"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="questionData.total">
       </el-pagination>
     </div>
+    <!-- 修改题单 -->
     <el-dialog title="修改题单信息" :visible.sync="isShowChange" :width="'500px'">
       <el-form :model="questionListForm">
         <el-form-item label="题单名称" :label-width="'120px'">
@@ -55,24 +70,25 @@
         </el-form-item>
         <el-form-item label="题单背景" :label-width="'120px'">
           <el-upload
-              class="upload-demo"
-              action="https://jsonplaceholder.typicode.com/posts/"
-              :on-preview="handlePreview"
-              :on-remove="handleRemove"
-              :before-remove="beforeRemove"
-              :limit="1"
-              :on-exceed="handleExceed"
+              action="https://yicode.oss-cn-chengdu.aliyuncs.com"
+              :data="dataObj"
+              list-type="picture"
+              :multiple="false"
+              :file-list="fileList"
+              :show-file-list="false"
+              :before-upload="beforeUpload"
+              :on-success="handleUploadSuccess"
           >
             <el-button size="small" type="primary">点击上传</el-button>
-            <!--            <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>-->
           </el-upload>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="isShowChange = false">取 消</el-button>
-        <el-button type="primary" @click="isShowChange = false">确 定</el-button>
+        <el-button type="primary" @click="modifyQuestionList">确 定</el-button>
       </div>
     </el-dialog>
+    <!-- 新增题目 -->
     <el-dialog title="新增题目" :visible.sync="isShowAddQues" :width="'500px'">
       <el-form :model="newQuestion">
         <el-form-item label="新增题目id" :label-width="'120px'">
@@ -81,9 +97,10 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="isShowAddQues = false">取 消</el-button>
-        <el-button type="primary" @click="isShowAddQues = false">确 定</el-button>
+        <el-button type="primary" @click="addQuestion">确 定</el-button>
       </div>
     </el-dialog>
+    <!-- 删除题单 -->
     <el-dialog
         title="删除题单"
         :visible.sync="isShowDelQues"
@@ -98,78 +115,272 @@
 </template>
 
 <script>
+import {errorMsg, successMsg} from "@/util/elementMsgUtil";
+import {uuid} from "@/util/uuidUtil";
+
 export default {
   name: "QuestionListDetail",
   data() {
     return {
       isShow: false,
-      questionListName: '题单名称',
-      tableData: [
-        {
-          id: '11',
-          name: '题目名称',
-          difficulty: '难度',
-          time: '2016-05-02'
-        }
-      ],
+      // 题单 id
+      id: this.$route.params.id,
       // 修改题单
       isShowChange: false,
+      // 新增题目
+      isShowAddQues: false,
+      // 删除题目
+      isShowDelQues: false,
+      // 题目信息
+      questionData: {
+        current: 1,
+        pages: 0,
+        records: [
+          {
+            questionId: 0,
+            questionName: 0,
+            questionDifficulty: '',
+            passRate: ''
+          }
+        ],
+        size: 10,
+        total: 0
+      },
+      // 题单修改表单
       questionListForm: {
         questionListName: '',
         questionListBg: ''
       },
-      // 新增题目
-      isShowAddQues: false,
+      // 题目新增表单
       newQuestion: {
         newQuestionId: '',
       },
-      // 删除题目
-      isShowDelQues: false
+      // 图片上传秘钥
+      dataObj: {
+        policy: "",
+        signature: "",
+        key: "",
+        ossaccessKeyId: "",
+        dir: "",
+        host: "",
+      },
     }
+  },
+  computed: {
+    // 图片 url
+    imageUrl() {
+      return this.value;
+    },
+    // 图片名
+    imageName() {
+      if (this.value != null && this.value !== "") {
+        return this.value.substr(this.value.lastIndexOf("/") + 1);
+      } else {
+        return null;
+      }
+    },
+    // 图片列表
+    fileList() {
+      return [
+        {
+          name: this.imageName,
+          url: this.imageUrl,
+        },
+      ];
+    },
+  },
+  mounted() {
+    this.getQuestionListDetail()
+    this.getQuestionPage()
   },
   methods: {
     // 返回
-    goBack () {
+    goBack() {
       this.$router.push({path: "/admin/center/list"})
     },
+    // 获取题单详情
+    getQuestionListDetail() {
+      this.asyncGetQuestionListDetail().then(({data}) => {
+        this.questionListForm.questionListName = data.data.favoriteName
+        this.questionListForm.questionListBg = data.data.favoriteBg
+      })
+    },
+    // 获取题单题目列表
+    getQuestionPage() {
+      this.asyncGetQuestionPage().then(({data}) => {
+        this.questionData = data.data
+      })
+    },
+    // 修改题单
+    modifyQuestionList() {
+      if (this.questionListForm.questionListName === null ||
+          this.questionListForm.questionListName === '') {
+        errorMsg("请输入题单名称")
+        return
+      }
+      if (this.questionListForm.questionListBg === null ||
+          this.questionListForm.questionListBg === '') {
+        errorMsg("请上传题单封面")
+        return;
+      }
+      this.asyncModifyQuestionList().then(({data}) => {
+        successMsg("题单修改成功")
+        this.questionListName = data.data.favoriteName
+        this.isShowChange = false
+      })
+    },
     // 删除题单
-    delQuesList () {
-      this.isShowDelQues = false
+    delQuesList() {
+      this.asyncDelQuestionList().then(() => {
+        successMsg("题单删除成功")
+        this.goBack()
+      })
     },
-    handleRemove(file, fileList) {
-      console.log(file, fileList);
+    // 增加题单题目
+    addQuestion() {
+      this.asyncAddQuestion().then(() => {
+        successMsg("增加题目成功")
+        this.isShowAddQues = false
+        this.getQuestionPage()
+        this.newQuestion.newQuestionId = ''
+      })
     },
-    handlePreview(file) {
-      console.log(file);
+    // 删除题单题目
+    delQuestion(questionId) {
+      this.asyncDelQuestion(questionId).then(() => {
+        successMsg("删除题目成功")
+        this.isShowDelQues = false
+        this.getQuestionPage()
+      })
     },
-    handleExceed(files, fileList) {
-      this.$message.warning(`当前限制选择 3 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`);
+    // 分页插件 => 切换每页展示数量
+    handleSizeChange(val) {
+      this.questionData.size = val;
+      this.getQuestionPage()
     },
-    beforeRemove(file, fileList) {
-      return this.$confirm(`确定移除 ${ file.name }？`);
-    }
+    // 分页插件 => 换页
+    handleCurrentChange(val) {
+      this.questionData.current = val;
+      this.getQuestionPage()
+    },
+    // 上传前钩子 => 获取 oss 上传凭证
+    beforeUpload() {
+      return new Promise((resolve) => {
+        new Promise((resolve, reject) => {
+          console.log("reject : {}", reject);
+          this.$axios({
+            url: "/yicode-thirdpart-openapi/open/oss/upload/policy",
+            method: "post",
+          }).then(({data}) => {
+            resolve(data);
+          });
+        }).then(({data}) => {
+          console.log("response : ", data);
+          this.dataObj.policy = data.policy;
+          this.dataObj.signature = data.signature;
+          this.dataObj.ossaccessKeyId = data.accessKey;
+          this.dataObj.key = data.dir + uuid() + "_${filename}";
+          this.dataObj.dir = data.dir;
+          this.dataObj.host = data.host;
+          resolve(true);
+        })
+      });
+    },
+    // 上传成功后钩子 => 获取图片 url
+    handleUploadSuccess(res, file) {
+      this.fileList.pop();
+      this.fileList.push({
+        name: file.name,
+        url:
+            this.dataObj.host +
+            "/" +
+            this.dataObj.key.replace("${filename}", file.name),
+      });
+      this.questionListForm.questionListBg = this.fileList[0].url;
+    },
+    // 异步方法 => 获取题单详情
+    async asyncGetQuestionListDetail() {
+      return await this.$axios({
+        url: "/yicode-question-openapi/open/admin/question/list/detail?id=" + this.id,
+        method: "get",
+      });
+    },
+    // 异步方法 => 删除题单
+    async asyncDelQuestionList() {
+      return await this.$axios({
+        url: "/yicode-question-openapi/open/admin/question/list/del?id=" + this.id,
+        method: "post",
+      });
+    },
+    // 异步方法 => 修改题单
+    async asyncModifyQuestionList() {
+      return await this.$axios({
+        url: "/yicode-question-openapi/open/admin/question/list/modify",
+        method: "post",
+        data: {
+          id: this.id,
+          "questionListName": this.questionListForm.questionListName,
+          "questionListBg": this.questionListForm.questionListBg
+        }
+      });
+    },
+    // 异步方法 => 查看题单题目
+    async asyncGetQuestionPage() {
+      return await this.$axios({
+        url: "/yicode-question-openapi/open/admin/question/list/question/page",
+        method: "post",
+        data: {
+          "favoriteId": this.id,
+          "pageSize": this.questionData.size,
+          "page": this.questionData.current,
+        }
+      });
+    },
+    // 异步方法 => 增加题单题目
+    async asyncAddQuestion() {
+      return await this.$axios({
+        url: "/yicode-question-openapi/open/admin/question/list/question/add",
+        method: "post",
+        data: {
+          "questionId": this.newQuestion.newQuestionId,
+          "id": this.id
+        }
+      });
+    },
+    // 异步方法 => 删除题单题目
+    async asyncDelQuestion(questionId) {
+      return await this.$axios({
+        url: "/yicode-question-openapi/open/admin/question/list/question/del",
+        method: "post",
+        data: {
+          "questionId": questionId,
+          "id": this.id
+        }
+      });
+    },
   },
-  mounted() {
-  }
 }
 </script>
 
 <style lang="scss" scoped>
 .question-list-detail {
   width: 100%;
+
   .func {
     height: 50px;
     line-height: 50px;
     width: 100%;
     background: #99a9bf;
     position: relative;
+
     .back {
       position: absolute;
       left: 5px;
       top: 0;
       cursor: pointer;
     }
-    &>i {
+
+    & > i {
       position: absolute;
       right: 20px;
       top: 13px;
@@ -177,11 +388,18 @@ export default {
       font-weight: bolder;
       transition: all 0.3s;
       cursor: pointer;
+
       &:hover {
         color: #FFFFFF;
       }
     }
+
+
     .el-icon-edit {
+      right: 100px;
+    }
+
+    .el-icon-plus {
       right: 60px;
     }
   }

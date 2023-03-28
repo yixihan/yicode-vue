@@ -9,7 +9,7 @@
     <div class="index_right">
       <!--  右侧组件 -->
       <speed-progress/>
-<!--      <calendar/>-->
+      <calendar/>
     </div>
   </div>
 </template>

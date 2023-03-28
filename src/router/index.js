@@ -64,7 +64,7 @@ const routes = [
             component: () => import("@/views/adminCenter/List.vue")
           },
           {
-            path: "/admin/center/list-details",
+            path: "/admin/center/list-details/:id",
             name: "QuestionListDetail",
             component: () => import("@/views/adminCenter/QuestionListDetail.vue")
           },
