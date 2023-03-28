@@ -33,7 +33,7 @@ export default {
     // 获取题单列表
     getQuestionList () {
       this.asyncGetQuestionList().then(({data}) => {
-        this.favoriteList = data.data
+        this.favoriteList = data.data.records
       })
     },
     goQuestion(val) {
@@ -44,8 +44,12 @@ export default {
     // 异步方法 => 获取题单列表
     async asyncGetQuestionList () {
       return await this.$axios({
-        url: "/yicode-question-openapi/open/admin/question/list/list",
+        url: "/yicode-question-openapi/open/admin/question/list/page",
         method: "post",
+        data: {
+          "page": 1,
+          "pageSize": 8,
+        }
       });
     }
   }

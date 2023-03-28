@@ -197,6 +197,10 @@ export default {
       // 难度选项
       difficultyOptions: [
         {
+          value: "",
+          label: "全部"
+        },
+        {
           value: 'EASY',
           label: '简单'
         },
@@ -213,6 +217,10 @@ export default {
       stateValue: '',
       // 状态选项
       stateOptions: [
+        {
+          value: "",
+          label: "全部"
+        },
         {
           value: 'UN_DO',
           label: '未开始'
