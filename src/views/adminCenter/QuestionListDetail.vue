@@ -8,6 +8,7 @@
       </div>
       <i class="el-icon-edit" @click="isShowChange = true"></i>
       <i class="el-icon-plus" @click="isShowAddQues = true"></i>
+      <i class="el-icon-delete-solid" @click="isShowDelQues = true"></i>
     </div>
     <el-table
         :data="tableData"
@@ -83,6 +84,16 @@
         <el-button type="primary" @click="isShowAddQues = false">确 定</el-button>
       </div>
     </el-dialog>
+    <el-dialog
+        title="删除题单"
+        :visible.sync="isShowDelQues"
+        width="30%">
+      <span>确定要删除题单吗?</span>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="isShowDelQues = false">取 消</el-button>
+        <el-button type="primary" @click="delQuesList()">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -111,13 +122,19 @@ export default {
       isShowAddQues: false,
       newQuestion: {
         newQuestionId: '',
-      }
+      },
+      // 删除题目
+      isShowDelQues: false
     }
   },
   methods: {
     // 返回
     goBack () {
       this.$router.push({path: "/admin/center/list"})
+    },
+    // 删除题单
+    delQuesList () {
+      this.isShowDelQues = false
     },
     handleRemove(file, fileList) {
       console.log(file, fileList);

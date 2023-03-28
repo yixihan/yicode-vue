@@ -1,22 +1,12 @@
 <template>
   <div class="question-list">
     <i class="el-icon-plus" @click="isShowAdd = true"></i>
-    <div class="question-form" @click="goQuestionListDetail()">
+    <div class="question-form"
+         v-for="(item, index) in questionList"
+         :key="index"
+         @click="goQuestionListDetail(item.id)"
+    >
       <img src="@/assets/img/admin/test02.jpg" alt=""/>
-      <div class="mask"></div>
-      <h2>题单名称哈哈哈</h2>
-      <h3>999+</h3>
-      <span class="time">修改时间: 2023-12-09 14:52</span>
-    </div>
-    <div class="question-form">
-      <img src="@/assets/img/admin/test03.png" alt=""/>
-      <div class="mask"></div>
-      <h2>题单名称哈哈哈</h2>
-      <h3>999+</h3>
-      <span class="time">修改时间: 2023-12-09 14:52</span>
-    </div>
-    <div class="question-form">
-      <img src="@/assets/img/admin/test04.jpg" alt=""/>
       <div class="mask"></div>
       <h2>题单名称哈哈哈</h2>
       <h3>999+</h3>
@@ -57,7 +47,9 @@ export default {
     return {
       // 展示新建题单
       isShowAdd: false,
-      // 题单列表
+      // 展示题单列表
+      questionList: [],
+      // 新增题单列表
       questionListForm: {
         questionListName: '',
         questionListBg: ''
@@ -65,6 +57,10 @@ export default {
     }
   },
   methods: {
+    async fetchData () {
+      // 调用获取题单的接口
+      // { this.questionList: res.data } = await
+    },
     // 打开题单详情
     goQuestionListDetail() {
       this.$router.push({path: "/admin/center/list-details"})

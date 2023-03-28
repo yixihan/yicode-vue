@@ -3,7 +3,9 @@
     <header>
       <div class="name">
         <span>题目名称</span>
-        <i class="el-icon-edit-outline" @click="goModify()"></i>
+        <div class="function">
+          <i class="el-icon-edit-outline" @click="goModify()"></i>
+        </div>
       </div>
       <div class="function">
         <div class="difficulty">
@@ -97,14 +99,22 @@ export default {
       width: 100%;
       font-weight: bolder;
       position: relative;
-      i {
+      .function {
         position: absolute;
+        top: 0;
         right: 0;
-        font-size: 22px;
-        cursor: pointer;
-        transition: all .1s;
-        &:hover {
-          color: #fbb957;
+        display: flex;
+        justify-content: right;
+        align-items: center;
+        i {
+          margin-left: 5px;
+          right: 0;
+          font-size: 22px;
+          cursor: pointer;
+          transition: all .1s;
+          &:hover {
+            color: #fbb957;
+          }
         }
       }
     }

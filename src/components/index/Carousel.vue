@@ -3,7 +3,9 @@
     <el-carousel height="350px">
       <el-carousel-item v-for="(item, index) in favoriteList"
                         :key="index"
-                        :style="'background: url(' +  item.favoriteBg + ')'">
+                        :style="'background: url(' +  item.favoriteBg + ')'"
+                        @click.native="goQuestion(item.id)"
+      >
       </el-carousel-item>
     </el-carousel>
   </div>
@@ -33,6 +35,11 @@ export default {
       this.asyncGetQuestionList().then(({data}) => {
         this.favoriteList = data.data
       })
+    },
+    goQuestion(val) {
+      // 向组件页面传递题单id值
+      this.$emit('listId', val)
+      this.$router.push({path: '/questionLibrary'})
     },
     // 异步方法 => 获取题单列表
     async asyncGetQuestionList () {

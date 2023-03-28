@@ -30,6 +30,13 @@
             </el-option>
           </el-select>
         </el-form-item>
+        <el-form-item label="使用: ">
+          <el-switch
+              v-model="questionInfo.isUse"
+              style="display: table !important;line-height: 40px !important;"
+          >
+          </el-switch>
+        </el-form-item>
       </el-form>
       <mavon-editor
           v-model="content"
@@ -48,7 +55,8 @@ export default {
       questionInfo: {
         name: '',
         difficulty: '简单',
-        label: ''
+        label: '',
+        isUse: true
       },
       options: [
         {

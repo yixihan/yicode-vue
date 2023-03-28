@@ -12,35 +12,42 @@
         :data="userData.records"
         :stripe="true"
         border
-        style="width: 100%">
+        style="width: 99.6%">
       <el-table-column
-          fixed
           prop="userId"
+          width="120"
+          align="center"
           label="用户id">
       </el-table-column>
       <el-table-column
           prop="userName"
+          width="120"
+          align="center"
           label="用户名">
       </el-table-column>
       <el-table-column
           prop="userMobile"
           label="用户手机号"
+          align="center"
       >
       </el-table-column>
       <el-table-column
           prop="userEmail"
           label="用户邮箱"
+          align="center"
       >
       </el-table-column>
       <el-table-column
           prop="createTime"
           label="注册时间"
+          align="center"
       >
       </el-table-column>
       <el-table-column
           fixed="right"
-          label="操作"
-          width="100">
+          align="center"
+          width="150"
+          label="操作">
         <template slot-scope="scope">
           <el-button type="text"
                      size="small"
@@ -192,5 +199,20 @@ export default {
     }
   }
 }
-
+::v-deep .el-table__row{
+  td:not(.is-hidden):last-child{
+    border-left:1px solid #b7b8bb;
+  }
+}
+::v-deep .el-table__fixed-header-wrapper {
+  .el-table__header {
+    thead {
+      tr {
+        th:not(.is-hidden):last-child {
+          border-left:1px solid #b7b8bb;
+        }
+      }
+    }
+  }
+}
 </style>

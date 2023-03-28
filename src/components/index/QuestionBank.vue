@@ -44,7 +44,7 @@
             </div>
             <div class="select-type-singles">
               <div v-show="refreshLabel">
-                <span v-for="(item, index) in labelOptions"
+                <span v-for="(item, index) in labelOptions.filter((item) => item.labelName.includes(labelName))"
                       :key="index"
                       :style="item.flag ? chooseLabelStyle : unChooseLabelStyle"
                       @click="chooseLabel(item)">{{ item.labelName }}
@@ -85,43 +85,45 @@
     </div>
     <!--  题目展示区-->
     <div class="question-list">
+      <div class="question-list-header--bar" v-if="id">
+        <span  @click="id = null">
+          <i class="el-icon-arrow-left">展示题库</i>
+        </span>
+        <h2>题单题目</h2>
+      </div>
       <!-- 表头 -->
       <div class="question-list-header question-list-flex">
         <div>状态</div>
-        <div>
+        <div @click="sort(0)">
           题目
-          <svg t="1677668789107" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
-               p-id="6644" width="12" height="12">
-            <path d="M158.08 460.8L518.528 0l360.32 460.8M878.848 561.536l-360.384 460.736L158.08 561.536"
-                  fill="#7a7a7a" p-id="6645"></path>
-          </svg>
+          <span>
+            <i class="el-icon-caret-top" :style="{'color': order[0].value === 1 ? '#059fff' : '#7a7a7a' }"></i>
+            <i class="el-icon-caret-bottom" :style="{'color': order[0].value === 2 ? '#059fff' : '#7a7a7a' }"></i>
+          </span>
         </div>
         <div>点赞数</div>
         <div>提交数</div>
         <div>通过数</div>
-        <div>
+        <div @click="sort(1)">
           题解
-          <svg t="1677668789107" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
-               p-id="6644" width="12" height="12">
-            <path d="M158.08 460.8L518.528 0l360.32 460.8M878.848 561.536l-360.384 460.736L158.08 561.536"
-                  fill="#7a7a7a" p-id="6645"></path>
-          </svg>
+          <span>
+            <i class="el-icon-caret-top" :style="{'color': order[1].value === 1 ? '#059fff' : '#7a7a7a' }"></i>
+            <i class="el-icon-caret-bottom" :style="{'color': order[1].value === 2 ? '#059fff' : '#7a7a7a' }"></i>
+          </span>
         </div>
-        <div>
+        <div @click="sort(2)">
           通过率
-          <svg t="1677668789107" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
-               p-id="6644" width="12" height="12">
-            <path d="M158.08 460.8L518.528 0l360.32 460.8M878.848 561.536l-360.384 460.736L158.08 561.536"
-                  fill="#7a7a7a" p-id="6645"></path>
-          </svg>
+          <span>
+            <i class="el-icon-caret-top" :style="{'color': order[2].value === 1 ? '#059fff' : '#7a7a7a' }"></i>
+            <i class="el-icon-caret-bottom" :style="{'color': order[2].value === 2 ? '#059fff' : '#7a7a7a' }"></i>
+          </span>
         </div>
-        <div>
+        <div @click="sort(3)">
           难度
-          <svg t="1677668789107" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
-               p-id="6644" width="12" height="12">
-            <path d="M158.08 460.8L518.528 0l360.32 460.8M878.848 561.536l-360.384 460.736L158.08 561.536"
-                  fill="#7a7a7a" p-id="6645"></path>
-          </svg>
+          <span>
+            <i class="el-icon-caret-top" :style="{'color': order[3].value === 1 ? '#059fff' : '#7a7a7a' }"></i>
+            <i class="el-icon-caret-bottom" :style="{'color': order[3].value === 2 ? '#059fff' : '#7a7a7a' }"></i>
+          </span>
         </div>
       </div>
       <!-- 内容 -->
@@ -273,13 +275,46 @@ export default {
           },
         ]
       },
+      // 排序方式
+      order: [
+        {
+          type: "题目",
+          value: 0,  // 0为默认, 1为升序, 2为降序
+        },
+        {
+          type: "题解",
+          value: 0,  // 0为默认, 1为升序, 2为降序
+        },
+        {
+          type: "通过率",
+          value: 0,  // 0为默认, 1为升序, 2为降序
+        },
+        {
+          type: "难度",
+          value: 0,  // 0为默认, 1为升序, 2为降序
+        }
+      ]
     }
   },
   mounted() {
     this.getQuestionDetails()
     this.getQuestionLabel()
   },
+  watch: {
+    // 监听id变化,更新列表
+    id: {
+      handler(newVal) {
+        // 调用接口
+        this.getQuestionDetails()
+      }
+    }
+  },
   methods: {
+    // 排序
+    sort(index) {
+      this.order[index].value = this.order[index].value === 2 ? 0 : this.order[index].value + 1
+      // 按要求进行排序
+    },
     // 切换标签展示类型
     changeTypeShow() {
       this.isType = !this.isType
@@ -488,7 +523,10 @@ export default {
         border-radius: 4px;
         background-color: #FFF;
         box-shadow: 0 2px 12px 0 rgb(0 0 0 / 10%);
-
+        overflow-y: auto;
+        &::-webkit-scrollbar {
+          display: none;
+        }
         .question-search {
           margin-top: 16px;
 
@@ -507,12 +545,17 @@ export default {
           flex-wrap: wrap;
 
           span {
+            display: inline-block;
             background: #e8e8e8;
             padding: 6px 14px;
             font-size: 14px;
             border-radius: 15px;
             cursor: pointer;
             margin: 5px 5px 0 0;
+            //height: 28px;
+            //line-height: 28px;
+            word-break:keep-all;
+            white-space: wrap;
           }
         }
       }
@@ -612,7 +655,18 @@ export default {
     margin-top: 10px;
     //border-top: 1px solid #e8e8e8;
     padding: 10px 0 0 0;
+    .question-list-header--bar {
+      display: block;
+      height: 30px;
+      line-height: 30px;
+      width: 100%;
+      span  {
+        position: absolute;
+        left: 15px;
+        cursor: default;
+      }
 
+    }
     .question-list-flex {
       width: 100%;
       height: 45px;
@@ -670,14 +724,24 @@ export default {
       border-bottom: 1px solid #e8e8e8;
       color: #7a7a7a;
       font-size: 14px;
+      padding-top: 30px;
 
       & > div {
         position: relative;
 
-        svg {
+        span {
           position: absolute;
           right: 10px;
-          top: 4px;
+          top: 0;
+          display: flex;
+          flex-direction: column;
+          i {
+            display: inline-block;
+            text-align: center;
+            width: 10px;
+            height: 10px;
+            line-height: 10px;
+          }
         }
 
         &:hover {
@@ -686,7 +750,6 @@ export default {
           }
         }
       }
-
       // 题目
       & > div:nth-child(2) {
         cursor: pointer;
