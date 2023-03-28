@@ -250,6 +250,33 @@ export default {
       },
       // 题目选择
       nameValue: '',
+      // 排序方式
+      order: [
+        {
+          type: "NAME",
+          value: 0,  // 0为默认, 1为升序, 2为降序
+        },
+        {
+          type: "NOTE",
+          value: 0,  // 0为默认, 1为升序, 2为降序
+        },
+        {
+          type: "PASS",
+          value: 0,  // 0为默认, 1为升序, 2为降序
+        },
+        {
+          type: "DIFFICULTY",
+          value: 0,  // 0为默认, 1为升序, 2为降序
+        }
+      ],
+      // 题解排序
+      noteSort: null,
+      // 难度排序
+      difficultySort: null,
+      // 名字排序
+      nameSort : null,
+      // 通过率排序
+      passSort: null,
       // 可选的
       pageSize: 10,
       // 可选的每页展示数据量
@@ -275,25 +302,6 @@ export default {
           },
         ]
       },
-      // 排序方式
-      order: [
-        {
-          type: "题目",
-          value: 0,  // 0为默认, 1为升序, 2为降序
-        },
-        {
-          type: "题解",
-          value: 0,  // 0为默认, 1为升序, 2为降序
-        },
-        {
-          type: "通过率",
-          value: 0,  // 0为默认, 1为升序, 2为降序
-        },
-        {
-          type: "难度",
-          value: 0,  // 0为默认, 1为升序, 2为降序
-        }
-      ]
     }
   },
   mounted() {
@@ -310,11 +318,6 @@ export default {
     }
   },
   methods: {
-    // 排序
-    sort(index) {
-      this.order[index].value = this.order[index].value === 2 ? 0 : this.order[index].value + 1
-      // 按要求进行排序
-    },
     // 切换标签展示类型
     changeTypeShow() {
       this.isType = !this.isType
@@ -409,6 +412,22 @@ export default {
       this.refreshLabel = true
       this.getQuestionDetails()
     },
+    // 排序
+    sort(index) {
+      this.order[index].value = this.order[index].value === 2 ? 0 : this.order[index].value + 1
+      // 处理数据
+      if (this.order[index].type === 'DIFFICULTY') {
+        this.difficultySort = this.order[index].value === 0 ? null : this.order[index].value !== 1
+      } else if (this.order[index].type === 'NAME') {
+        this.nameSort = this.order[index].value === 0 ? null : this.order[index].value !== 1
+      } else if (this.order[index].type === 'PASS') {
+        this.passSort = this.order[index].value === 0 ? null : this.order[index].value !== 1
+      } else if (this.order[index].type === 'NOTE') {
+        this.noteSort = this.order[index].value === 0 ? null : this.order[index].value !== 1
+      }
+      // 按要求进行排序
+      this.getQuestionDetails()
+    },
     // 切换每页展示数量
     handleSizeChange(val) {
       this.data.size = val
@@ -453,7 +472,11 @@ export default {
           "questionName": this.nameValue,
           "difficulty": this.difficultyValue,
           "status": this.stateValue,
-          "label": Array.from(this.labelValue.values())
+          "label": Array.from(this.labelValue.values()),
+          "noteSort": this.noteSort,
+          "difficultySort": this.difficultySort,
+          "nameSort" : this.nameSort,
+          "passSort": this.passSort
         }
       });
     },
@@ -555,7 +578,7 @@ export default {
             //height: 28px;
             //line-height: 28px;
             word-break:keep-all;
-            white-space: wrap;
+            white-space: pre;
           }
         }
       }
