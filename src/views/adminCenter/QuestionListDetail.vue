@@ -288,7 +288,7 @@ export default {
       this.questionData.size = val;
       this.getQuestionPage()
     },
-    // 分页插件 => 换页
+    // 分页插件 => 切换页数
     handleCurrentChange(val) {
       this.questionData.current = val;
       this.getQuestionPage()

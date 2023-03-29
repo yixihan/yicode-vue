@@ -369,9 +369,6 @@ export default {
         }
         this.asyncGetQuestion(pagingReq).then(({data}) => {
           this.data = data.data
-          if (this.data.total <= this.data.size) {
-            this.hide = true;
-          }
         })
       } else if (this.type === 'QUESTION_LIST') {
         // 题单
@@ -382,9 +379,6 @@ export default {
         }
         this.asyncGetQuestionList(pagingReq).then(({data}) => {
           this.data = data.data
-          if (this.data.total <= this.data.size) {
-            this.hide = true;
-          }
         })
       }
     },
@@ -436,12 +430,12 @@ export default {
       // 按要求进行排序
       this.getQuestionDetails()
     },
-    // 切换每页展示数量
+    // 分页插件 => 切换每页展示数量
     handleSizeChange(val) {
       this.data.size = val
       this.getQuestionDetails()
     },
-    // 切页
+    // 分页插件 => 切换页数
     handleCurrentChange(val) {
       this.data.current = val
       this.getQuestionDetails()

@@ -4,7 +4,7 @@
         v-on:choseDay="clickDay"
         v-on:changeMonth="changeDate"
         v-on:isToday="clickToday"
-        :agoDayHide="1672502400"
+        agoDayHide="1672502400"
         :futureDayHide="nowDay"
         :markDate="finishDate"
     ></Calendar>

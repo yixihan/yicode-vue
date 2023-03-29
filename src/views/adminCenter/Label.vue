@@ -86,12 +86,12 @@ export default {
       this.labelNameInput = ''
       this.getLabelList()
     },
-    // 切换页码
+    // 分页插件 => 切换每页展示数量
     handleSizeChange(val) {
       this.labelData.size = val
       this.getLabelList()
     },
-    // 切换页数
+    // 分页插件 => 切换页数
     handleCurrentChange(val) {
       this.labelData.current = val
       this.getLabelList()

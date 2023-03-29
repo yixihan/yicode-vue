@@ -33,9 +33,11 @@ export default {
     }
   },
   methods: {
+    // 分页插件 => 切换每页展示数量
     handleSizeChange(val) {
       console.log(`每页 ${val} 条`);
     },
+    // 分页插件 => 切换页数
     handleCurrentChange(val) {
       console.log(`当前页: ${val}`);
     }
