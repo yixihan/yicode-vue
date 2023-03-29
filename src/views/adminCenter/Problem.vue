@@ -114,6 +114,7 @@ export default {
     }
   },
   methods: {
+    // 新建题目
     CreateQuestion () {
       this.isShowCreateQuestion = !this.isShowCreateQuestion
     }

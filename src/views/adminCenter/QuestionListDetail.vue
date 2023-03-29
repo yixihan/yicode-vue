@@ -14,6 +14,7 @@
     <!-- 题目数据展示 -->
     <el-table
         :data="questionData.records"
+        :cell-style="difficultyStyle"
         border
         style="width: 100%">
       <el-table-column
@@ -31,6 +32,7 @@
       >
       </el-table-column>
       <el-table-column
+          :formatter="rateFormatter"
           prop="passRate"
           label="通过率">
       </el-table-column>
@@ -194,6 +196,34 @@ export default {
     this.getQuestionPage()
   },
   methods: {
+    // 设置题目难度颜色
+    difficultyStyle({row, column}) {
+      if (column.label === '难度') {
+        let style;
+        switch (row.questionDifficulty) {
+          case '困难': {
+            style = 'color: #ff2d55'
+            break;
+          }
+          case '中等': {
+            style = 'color: #ffb800'
+            break;
+          }
+          case '简单': {
+            style = 'color: #00af9b'
+            break;
+          }
+          default:
+            style = ''
+        }
+
+        return style
+      }
+    },
+    // 通过率增加 %
+    rateFormatter(row) {
+      return row.passRate + '%'
+    },
     // 返回
     goBack() {
       this.$router.push({path: "/admin/center/list"})
@@ -403,5 +433,15 @@ export default {
       right: 60px;
     }
   }
+}
+
+.easy-question {
+  color: #ff2d55;
+}
+.medium-question {
+  color: #ffb800;
+}
+.hard-question {
+  color: #ff2d55;
 }
 </style>

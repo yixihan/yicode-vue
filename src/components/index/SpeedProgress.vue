@@ -8,7 +8,7 @@
         <div class="main-left-text" @mouseenter="isPercentage = true" @mouseleave="isPercentage = false">
           <div class="now" v-show="!isPercentage">{{ userRate.acceptedQuestion }}</div>
           <div class="total" v-show="!isPercentage">{{ questionCount.question }}</div>
-          <div class="now" v-show="isPercentage">{{ userRate.acceptedQuestionRate }}</div>
+          <div class="now" v-show="isPercentage">{{ userRate.acceptedQuestionRate }}%</div>
           <div class="total" v-show="isPercentage">通过率</div>
         </div>
       </div>
