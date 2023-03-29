@@ -17,7 +17,7 @@ export default {
   components: {QuestionDetail, QuestionEdit},
   data() {
     return {
-      questionId: this.$route.query.questionId
+      questionId: this.$route.query.id,
     }
   },
   methods: {

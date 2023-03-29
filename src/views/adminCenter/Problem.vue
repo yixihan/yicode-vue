@@ -5,7 +5,7 @@
       <el-input v-model="searchQuesName" placeholder="问题名称"></el-input>
       <el-select v-model="searchDifficulty" placeholder="题目难度">
         <el-option
-            v-for="item in searchOptionsDifficulty"
+            v-for="item in searchDifficultyOptions"
             :key="item.value"
             :label="item.label"
             :value="item.value">
@@ -18,36 +18,40 @@
                  placeholder="题目标签"
       >
         <el-option
-            v-for="item in searchLabelOptions"
+            v-for="item in labelOptions"
             :key="item.labelId"
             :label="item.labelName"
             :value="item.labelId">
         </el-option>
       </el-select>
-      <el-button type="primary">搜索</el-button>
-      <el-button @click="CreateQuestion">新建题目</el-button>
+      <el-button type="primary" @click="getQuestionData">搜索</el-button>
+      <el-button @click="isShowCreateQuestion = true">新建题目</el-button>
 
       <!-- 新建题目 -->
       <el-dialog title="新建题目" :visible.sync="isShowCreateQuestion" :width="'500px'">
-        <el-form :model="createQuestion">
+        <el-form :model="createQuestionForm">
           <el-form-item label="题目名称" :label-width="'100px'">
-            <el-input v-model="createQuestion.questionName" autocomplete="off"></el-input>
+            <el-input v-model="createQuestionForm.questionName" autocomplete="off"></el-input>
           </el-form-item>
           <el-form-item label="题目难度" :label-width="'100px'">
-            <el-select v-model="createQuestion.questionDifficulty" placeholder="题目难度">
+            <el-select v-model="createQuestionForm.questionDifficulty" placeholder="题目难度">
               <el-option
-                  v-for="item in searchOptionsDifficulty"
-                  :key="item.value"
+                  v-for="(item, index) in createDifficultyOptions"
+                  :key="index"
                   :label="item.label"
                   :value="item.value">
               </el-option>
             </el-select>
           </el-form-item>
           <el-form-item label="题目标签" :label-width="'100px'">
-            <el-select v-model="createQuestion.questionLabel" filterable multiple collapse-tags placeholder="题目标签">
+            <el-select v-model="createQuestionForm.questionLabel"
+                       filterable
+                       multiple
+                       collapse-tags
+                       placeholder="题目标签">
               <el-option
-                  v-for="item in searchLabelOptions"
-                  :key="item.labelId"
+                  v-for="(item, index) in labelOptions"
+                  :key="index"
                   :label="item.labelName"
                   :value="item.labelId">
               </el-option>
@@ -56,7 +60,7 @@
         </el-form>
         <div slot="footer" class="dialog-footer">
           <el-button @click="isShowCreateQuestion = false">取 消</el-button>
-          <el-button type="primary" @click="isShowCreateQuestion = false">确 定</el-button>
+          <el-button type="primary" @click="createQuestion">确 定</el-button>
         </div>
       </el-dialog>
     </div>
@@ -71,61 +75,59 @@
             :cell-style="difficultyStyle"
             :stripe="true"
             :border="true"
+            @sort-change="sortQuestion"
             size="small"
             border>
           <el-table-column
               prop="questionName"
               label="问题名称"
               width="180"
+              sortable="custom"
               fixed>
           </el-table-column>
           <el-table-column
               prop="questionDifficulty"
-              label="问题难度"
-              width="100"
-              sortable
+              label="难度"
+              width="70"
+              sortable="custom"
               fit>
           </el-table-column>
           <el-table-column
               prop="likeCount"
               label="点赞数"
               width="90"
-              sortable
               fit>
           </el-table-column>
           <el-table-column
               prop="commitCount"
               label="提交数"
               width="90"
-              sortable
               fit>
           </el-table-column>
           <el-table-column
               prop="successCount"
               label="通过数"
               width="90"
-              sortable
               fit>
           </el-table-column>
           <el-table-column
               prop="noteCount"
               label="题解数"
               width="90"
-              sortable
+              sortable="custom"
               fit>
           </el-table-column>
           <el-table-column
               prop="commentCount"
               label="评论数"
               width="90"
-              sortable
               fit>
           </el-table-column>
           <el-table-column
               prop="passRate"
               label="通过率"
               width="90"
-              sortable
+              sortable="custom"
               :formatter="rateFormatter"
               fit>
           </el-table-column>
@@ -141,11 +143,14 @@
               width="90">
             <template v-slot="scope">
               <el-button type="text" size="small"
-                         @click="toQuestionInfo(scope.$index)"
-              >查看</el-button>
+                         @click="toQuestionInfo(scope.row.questionId)"
+              >查看
+              </el-button>
               <el-button type="text" size="small"
                          style="color: red"
-              >删除</el-button>
+                         @click="delQuestion(scope.row.questionId)"
+              >删除
+              </el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -170,18 +175,19 @@
 
 <script>
 import QuestionPagination from "@/components/admin/QuestionPagination.vue";
+import {successMsg, errorMsg} from "@/util/elementMsgUtil";
 
 export default {
   name: "AdminProblem",
   components: {
     QuestionPagination
   },
-  data () {
+  data() {
     return {
       // 搜索题目名
       searchQuesName: '',
-      // 题目难度
-      searchOptionsDifficulty: [
+      // 搜索题目难度
+      searchDifficultyOptions: [
         {
           value: "",
           label: "全部"
@@ -201,42 +207,41 @@ export default {
       ],
       searchDifficulty: '',
       // 题目标签
-      searchLabelOptions: [
+      labelOptions: [
         {
-          labelId: '1614644409867751425',
-          labelName: '数组'
-        }, {
-          labelId: '选项2',
-          labelName: '字符串'
-        }, {
-          labelId: '选项3',
-          labelName: '排序'
-        }, {
-          labelId: '选项4',
-          labelName: '树'
+          labelId: '',
+          labelName: '',
         }
       ],
-      searchLabel: '',
+      searchLabel: [],
       // 题解排序
       noteSort: null,
       // 难度排序
       difficultySort: null,
       // 名字排序
-      nameSort : null,
+      nameSort: null,
       // 通过率排序
       passSort: null,
       // 新建题目
-      createQuestion: {
+      createQuestionForm: {
         questionName: '',
-        questionDesc: '',
         questionDifficulty: '',
-        questionLabel: [
-          {
-            "labelId": 0,
-            "labelName": ""
-          }
-        ]
       },
+      // 题目难度
+      createDifficultyOptions: [
+        {
+          value: 'EASY',
+          label: '简单'
+        },
+        {
+          value: 'MEDIUM',
+          label: '中等'
+        },
+        {
+          value: 'HARD',
+          label: '困难'
+        }
+      ],
       // 新建题目展示
       isShowCreateQuestion: false,
       hide: false,
@@ -263,7 +268,8 @@ export default {
     }
   },
   mounted() {
-    this.getQuestionData()
+    this.getQuestionData();
+    this.getQuestionLabel();
   },
   methods: {
     // 设置题目难度颜色
@@ -294,65 +300,115 @@ export default {
     rateFormatter(row) {
       return row.passRate + '%'
     },
-    // 新建题目
-    CreateQuestion() {
-      this.isShowCreateQuestion = !this.isShowCreateQuestion
-    },
+    // 获取问题列表
     getQuestionData() {
       this.asyncGetQuestion().then(({data}) => {
         this.questionData = data.data
       })
     },
+    // 新建题目
+    createQuestion() {
+      if (this.createQuestionForm.questionName === '') {
+        errorMsg("请输入题目名称")
+        return
+      }
+      if (this.createQuestionForm.questionDifficulty === '') {
+        errorMsg("请选择题目难度");
+        return;
+      }
+      this.asyncCreateQuestion().then(({data}) => {
+        successMsg("新建题目成功")
+        this.toQuestionInfo(data.data.questionId)
+      })
+    },
+    // 删除题目
+    delQuestion(questionId) {
+      this.asyncDelQuestion(questionId).then(() => {
+        successMsg("删除题目成功");
+        this.getQuestionData()
+      })
+    },
+
+    // 题目详情
+    toQuestionInfo(questionId) {
+      this.$router.push({path: '/admin/center/detail', query: {id: questionId}})
+    },
+    // 排序方法
+    sortQuestion(column) {
+      console.log(column)
+      let sort = column.order === null ? null : column.order !== 'ascending'
+      if (column.prop === 'questionName') {
+        this.nameSort = sort
+      } else if (column.prop === 'questionDifficulty') {
+        this.difficultySort = sort
+      } else if (column.prop === 'noteCount') {
+        this.nameSort = sort
+      } else if (column.prop === 'passRate') {
+        this.passSort = sort
+      }
+
+      this.getQuestionData()
+    },
     // 获取问题标签
     getQuestionLabel() {
       this.asyncGetQuestionLabel(this.labelName).then(({data}) => {
         this.labelOptions = data.data
-        this.labelOptions.forEach((item) => {
-          item.flag = false
-        })
       })
-    },
-    // 题目详情
-    toQuestionInfo(index) {
-      console.log(index)
-      this.$router.push({path: '/admin/center/detail', query: {id: this.questionData.records[index].questionId}})
     },
     // 分页插件 => 切换每页展示数量
     handleSizeChange(val) {
       this.questionData.size = val;
-      this.
-      console.log(`每页 ${val} 条`);
+      this.getQuestionData();
     },
     // 分页插件 => 切换页数
     handleCurrentChange(val) {
-      console.log(`当前页: ${val}`);
+      this.questionData.current = val;
+      this.getQuestionData();
     },
     // 异步方法 => 获取题目列表
     async asyncGetQuestion() {
       return await this.$axios({
         url: "/yicode-question-openapi/open/question/query",
         method: "post",
-        questionData: {
+        data: {
           "pageSize": this.questionData.size,
           "page": this.questionData.current,
           "questionName": this.searchQuesName,
           "difficulty": this.searchDifficulty,
-          "label": Array.from(this.labelValue.values()),
+          "label": Array.from(this.searchLabel.values()),
           "noteSort": this.noteSort,
           "difficultySort": this.difficultySort,
-          "nameSort" : this.nameSort,
+          "nameSort": this.nameSort,
           "passSort": this.passSort
         }
       });
     },
     // 异步方法 => 获取所有题目标签
-    async asyncGetQuestionLabel(labelName) {
+    async asyncGetQuestionLabel() {
       return await this.$axios({
-        url: "/yicode-question-openapi/open/label/all/question?labelName=" + labelName,
+        url: "/yicode-question-openapi/open/label/all/question?labelName=",
         method: "get",
       });
     },
-
+    // 异步方法 => 创建题目
+    async asyncCreateQuestion() {
+      return await this.$axios({
+        url: "/yicode-question-openapi/open/question/add",
+        method: "post",
+        data: {
+          "questionDifficulty": this.createQuestionForm.questionDifficulty,
+          "questionName": this.createQuestionForm.questionName,
+        }
+      });
+    },
+    // 异步方法 => 删除题目
+    async asyncDelQuestion(questionId) {
+      return await this.$axios({
+        url: "/yicode-question-openapi/open/question/del",
+        method: "delete",
+        data: [questionId]
+      });
+    },
   }
 }
 </script>
