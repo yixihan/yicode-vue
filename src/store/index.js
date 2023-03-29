@@ -11,6 +11,7 @@ export default new Vuex.Store({
     user: JSON.parse(localStorage.getItem("user")),
     userInfo: JSON.parse(localStorage.getItem("userInfo")),
     userRoleList: JSON.parse(localStorage.getItem("userRoleList")),
+    questionListId: null,
   },
   getters: {
     getAccessToken: state => {
@@ -27,6 +28,9 @@ export default new Vuex.Store({
     },
     getUserRoleList: state => {
       return state.userRoleList
+    },
+    getQuestionListId: state => {
+      return state.questionListId
     },
     isAdmin: state => {
       return state.userRoleList !== null
@@ -73,6 +77,10 @@ export default new Vuex.Store({
       localStorage.setItem("user", JSON.stringify(""))
       localStorage.setItem("userRoleList", JSON.stringify(""))
       localStorage.setItem("userInfo", JSON.stringify(""))
+    },
+    // 设置题库id
+    setQuestionList: (state, data) => {
+      state.questionListId = data
     }
   },
   actions: {

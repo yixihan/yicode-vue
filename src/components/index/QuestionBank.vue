@@ -85,8 +85,8 @@
     </div>
     <!--  题目展示区-->
     <div class="question-list">
-      <div class="question-list-header--bar" v-if="id">
-        <span  @click="id = null">
+      <div class="question-list-header--bar" v-if="type === 'QUESTION_LIST'">
+        <span  @click="showQuestionList()">
           <i class="el-icon-arrow-left">展示题库</i>
         </span>
         <h2>题单题目</h2>
@@ -128,6 +128,7 @@
       </div>
       <!-- 内容 -->
       <div class="question-list-main question-list-flex"
+           v-if="data.records.length !== 0"
            v-for="(item, index) in data.records"
            :key="index">
         <div>
@@ -149,6 +150,7 @@
         </div>
       </div>
     </div>
+    <div class="null" v-if="data.records.length === 0">暂无数据</div>
     <!-- 分页组件 -->
     <div class="paging" v-if="type !== 'MAIN'">
       <el-pagination
@@ -323,9 +325,19 @@ export default {
         // 调用接口
         this.getQuestionDetails()
       }
+    },
+    type: {
+      handler(newVal) {
+        // 调用接口
+        this.getQuestionDetails()
+      }
     }
   },
   methods: {
+    // 返回题库
+    showQuestionList () {
+      this.type = "QUESTION"
+    },
     // 切换标签展示类型
     changeTypeShow() {
       this.isType = !this.isType
@@ -381,6 +393,7 @@ export default {
           this.data = data.data
         })
       }
+      this.$store.commit('setQuestionList', this.id)
     },
     // 重置搜索选项
     resetReq() {
@@ -488,7 +501,7 @@ export default {
         url: "/yicode-question-openapi/open/admin/question/list/question/page",
         method: "post",
         data: {
-          "id": this.id,
+          "favoriteId": this.id,
           "pageSize": paging.pageSize,
           "searchCount": paging.searchCount,
           "page": paging.page
@@ -688,7 +701,7 @@ export default {
       span  {
         position: absolute;
         left: 15px;
-        cursor: default;
+        cursor: pointer;
       }
 
     }
@@ -837,6 +850,11 @@ export default {
           color: #3b3b3b;
         }
       }
+    }
+    .null {
+      line-height: 36px;
+      height: 36px;
+      color: #7a7a7a;
     }
   }
 }

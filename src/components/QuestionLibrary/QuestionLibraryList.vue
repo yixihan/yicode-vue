@@ -6,7 +6,7 @@
       <el-carousel-item v-for="(item, index) in favoriteList"
                         :key="index"
                         :style="'background: url(' +  item.favoriteBg + ')'"
-                        @click="clickQuestionList(item.favoriteId)"
+                        @click.native="clickQuestionList(item.favoriteId)"
       >
         <h3 class="medium"/>
       </el-carousel-item>
@@ -36,7 +36,8 @@ export default {
     // 点击题单
     clickQuestionList (id) {
       // 父传子
-      this.$emit('id', id)
+      this.$emit('changeList', id)
+      console.log(id)
     },
     // 获取题单列表
     getQuestionList () {

@@ -11,6 +11,7 @@
 
       <li class="col bell-icon" v-if="isLogin">
         <i class="el-icon-bell"></i>
+        <message v-if="showMes"></message>
       </li>
       <li class="col" v-if="isAdmin" @click="toAdminCenter">
         <i class="el-icon-user-solid">管理中心</i>
@@ -24,10 +25,14 @@
 </template>
 
 <script>
+import Message from "@/components/common/Message.vue";
+
 export default {
   name: "Header",
+  components: {Message},
   data() {
     return {
+      showMes: true
     };
   },
   methods: {
@@ -143,6 +148,13 @@ export default {
     .bell-icon {
       min-width: auto !important;
       width: 40px !important;
+      position: relative;
+      z-index: 6;
+      &:hover {
+        .message {
+          height: 400px;
+        }
+      }
     }
 
     .text {

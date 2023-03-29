@@ -22,14 +22,18 @@ export default {
       questionBankList: [],
     }
   },
-  watch: {},
-  mounted() {
-    this.$on('list', res => {
-      // 获取主页传递的id值
-      this.id = res
-    })
+  created() {
+    this.getId()
   },
+  watch: {},
   methods: {
+    getId () {
+      this.id = this.$store.state.questionListId
+      if (this.id) {
+        this.type = "QUESTION_LIST"
+      }
+      console.log(this.id)
+    },
     // 默认获取题库的信息
     async fetchData () {
       // 调用获取题库的接口

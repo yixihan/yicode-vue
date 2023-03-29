@@ -12,12 +12,12 @@ import 'element-ui/lib/theme-chalk/index.css'
 import mavonEditor from 'mavon-editor'
 import 'mavon-editor/dist/css/index.css'
 import * as echarts from 'echarts'
-import Bus from './util/eventBus'
+// import Bus from './util/eventBus'
 
 
 Vue.prototype.$echarts = echarts
 Vue.prototype.$axios = axios
-Vue.prototype.$bus = Bus
+Vue.prototype.$bus = new Vue()
 
 import "mavon-editor/dist/css/index.css";
 Vue.component("mavon-editor", mavonEditor);
