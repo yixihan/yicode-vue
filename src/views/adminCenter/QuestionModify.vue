@@ -5,12 +5,12 @@
       <span>返回</span>
     </div>
     <div class="modify">
-      <el-form :label-position="'right'" label-width="80px" :model="formLabelAlign">
+      <el-form label-position="right" label-width="80px" :model="questionData">
         <el-form-item label="题目名称: ">
-          <el-input v-model="questionInfo.name" :width="'120px'"></el-input>
+          <el-input v-model="questionData.questionName" :width="'120px'"></el-input>
         </el-form-item>
         <el-form-item label="难度: ">
-          <el-radio-group v-model="questionInfo.difficulty">
+          <el-radio-group v-model="questionData.questionDifficulty">
             <el-radio :label="'简单'">简单</el-radio>
             <el-radio :label="'中等'">中等</el-radio>
             <el-radio :label="'困难'">困难</el-radio>
@@ -18,29 +18,28 @@
         </el-form-item>
         <el-form-item label="标签: ">
           <el-select
-              v-model="questionInfo.label"
+              v-model="labelValues"
               multiple
               collapse-tags
               placeholder="请选择">
             <el-option
-                v-for="item in options"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value">
+                v-for="(item, index) in labelOptions"
+                :key="index"
+                :label="item.labelName"
+                :value="item.labelId">
             </el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="使用: ">
           <el-switch
-              v-model="questionInfo.isUse"
+              v-model="questionData.enable"
               style="display: table !important;line-height: 40px !important;"
           >
           </el-switch>
         </el-form-item>
       </el-form>
       <mavon-editor
-          v-model="content"
-          :toolbarsFlag="false"
+          v-model="questionData.questionDesc"
       ></mavon-editor>
     </div>
     <el-button type="primary">确认修改</el-button>
@@ -52,29 +51,87 @@ export default {
   name: "QuestionModify",
   data() {
     return {
-      questionInfo: {
-        name: '',
-        difficulty: '简单',
+      // 问题数据
+      questionData: {
+        questionId: this.$route.query.id,
+        questionName: '',
+        questionDifficulty: '简单',
         label: '',
-        isUse: true
+        questionDesc: '',
+        enable: true
       },
-      options: [
+      // 可选标签
+      labelOptions: [
         {
-          label: '数据结构',
-          value: 1,
-        },
-        {
-          label: '链表',
-          value: 2,
-        },
+          labelId: '',
+          labelName: '',
+        }
       ],
-      content: '# hahahaha'
+      // 问题标签
+      labelValues: []
+
     }
   },
+  mounted() {
+    this.getQuestionDetail();
+    this.getQuestionLabel();
+  },
   methods: {
-    goBack () {
-      this.$router.push({path: "/admin/center/problem"})
-    }
+    // 返回
+    goBack() {
+      this.$router.push({
+        path: '/admin/center/detail',
+        query: {id: this.questionData.questionId}
+      })
+    },
+    // 获取题目详情
+    getQuestionDetail() {
+      this.asyncGetQuestionDetail().then(({data}) => {
+        this.questionData = data.data
+      })
+    },
+    // 获取问题标签
+    getQuestionLabel() {
+      this.asyncGetQuestionLabel().then(({data}) => {
+        this.labelOptions = data.data
+      })
+    },
+    // 异步方法 => 获取题目详情
+    async asyncGetQuestionDetail() {
+      return await this.$axios({
+        url: "/yicode-question-openapi/open/question/detail?questionId=" + this.questionData.questionId,
+        method: "get",
+      });
+    },
+    // 异步方法 => 修改该问题的标签
+    async asyncModifyQuestionDetail() {
+      return await this.$axios({
+        url: "/yicode-question-openapi/open/question/modify",
+        method: "post",
+        data: this.questionData
+      });
+    },
+    // 异步方法 => 获取该问题的标签
+    async asyncGetQuestionDetailLabel() {
+      return await this.$axios({
+        url: "/yicode-question-openapi/open/label/detail/question?questionId=" + this.questionData.questionId,
+        method: "get",
+      });
+    },
+    // 异步方法 => 修改该问题的标签
+    async asyncModifyQuestionDetailLabel() {
+      return await this.$axios({
+        url: "/yicode-question-openapi/open/question/detail",
+        method: "post",
+      });
+    },
+    // 异步方法 => 获取所有题目标签
+    async asyncGetQuestionLabel() {
+      return await this.$axios({
+        url: "/yicode-question-openapi/open/label/all/question?labelName=",
+        method: "get",
+      });
+    },
   }
 }
 </script>
@@ -87,30 +144,37 @@ export default {
   display: flex;
   flex-direction: column;
   background: #FFFFFF;
+
   .back {
     cursor: pointer;
     width: 100%;
     padding: 10px;
     text-align: left;
     transition: all .1s;
+
     &:hover {
       color: #fbb957;
     }
   }
+
   .modify {
     width: 100%;
     padding: 10px 50px;
+
     .el-form {
       width: 350px;
+
       .el-select {
         width: 270px !important;
       }
     }
+
     .v-note-wrapper {
       width: 80%;
       z-index: 1;
     }
   }
+
   .el-button {
     margin: 20px auto;
     width: 120px;

@@ -351,7 +351,7 @@ export default {
     },
     // 获取问题标签
     getQuestionLabel() {
-      this.asyncGetQuestionLabel(this.labelName).then(({data}) => {
+      this.asyncGetQuestionLabel().then(({data}) => {
         this.labelOptions = data.data
       })
     },
@@ -379,7 +379,8 @@ export default {
           "noteSort": this.noteSort,
           "difficultySort": this.difficultySort,
           "nameSort": this.nameSort,
-          "passSort": this.passSort
+          "passSort": this.passSort,
+          "enable": true
         }
       });
     },

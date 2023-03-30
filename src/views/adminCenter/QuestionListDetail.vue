@@ -320,7 +320,7 @@ export default {
     handleUploadSuccess(res, file) {
       this.fileList.pop();
       this.fileList.push({
-        name: file.name,
+        questionName: file.name,
         url:
             this.dataObj.host +
             "/" +

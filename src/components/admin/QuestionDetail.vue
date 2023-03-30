@@ -43,8 +43,8 @@
         <!-- 分享 -->
         <div class="share">
           <i class="el-icon-share" @click="isShowShare = !isShowShare"></i>
-          <div class="erweima" v-show="isShowShare">
-            <img src="">
+          <div class="qr-img" v-show="isShowShare">
+            <img :src="qrImg" alt="正在加载中">
           </div>
         </div>
       </div>
@@ -77,6 +77,8 @@ export default {
       isCreateSelect: false,
       isShowSelect: false,
       isShowShare: false,
+      // 二维码
+      qrImg: '',
       // 问题明细
       questionData: {
         questionId: 0,
@@ -97,6 +99,7 @@ export default {
   },
   mounted() {
     this.getQuestionDetail()
+    this.shareQuestion()
   },
   methods: {
     // 去修改题目页面
@@ -109,11 +112,32 @@ export default {
         this.questionData = data.data
       })
     },
+    // 分享题目
+    shareQuestion() {
+      let url = window.location.href
+      this.asyncGetQrPhoto(url).then(({data}) => {
+        let blob = data
+        let reader = new FileReader()
+        // 转为 base64
+        reader.readAsDataURL(blob)
+        reader.onload = () => {
+          this.qrImg = reader.result
+        }
+      })
+    },
     // 异步方法 => 获取题目详情
     async asyncGetQuestionDetail() {
       return await this.$axios({
         url: "/yicode-question-openapi/open/question/detail?questionId=" + this.questionId,
         method: "get",
+      });
+    },
+    // 异步方法 => 获取二维码
+    async asyncGetQrPhoto(url) {
+      return await this.$axios({
+        url: "/yicode-thirdpart-openapi/open/qr/create?param=" + url,
+        method: "get",
+        responseType: "blob"
       });
     },
   }
@@ -275,7 +299,7 @@ export default {
         cursor: pointer;
         position: relative;
 
-        .erweima {
+        .qr-img {
           position: absolute;
           z-index: 10;
           width: 80px;
