@@ -71,7 +71,7 @@ export default {
         policy: "",
         signature: "",
         key: "",
-        ossaccessKeyId: "",
+        OSSAccessKeyId: "",
         dir: "",
         host: "",
       },
@@ -148,8 +148,8 @@ export default {
           console.log("response : ", data);
           this.dataObj.policy = data.policy;
           this.dataObj.signature = data.signature;
-          this.dataObj.ossaccessKeyId = data.accessKey;
-          this.dataObj.key = data.dir + uuid() + "_${filename}";
+          this.dataObj.OSSAccessKeyId = data.accessKey;
+          this.dataObj.key = data.dir + "/" + uuid() + "_${filename}";
           this.dataObj.dir = data.dir;
           this.dataObj.host = data.host;
           resolve(true);

@@ -14,7 +14,7 @@ const a = 'http://192.168.101.30:11000/api/';
 // 配置默认前缀
 axios.defaults.baseURL = a
 axios.defaults.headers.post['Content-Type'] = 'application/json'
-
+axios.defaults.headers.put['Content-Type'] = 'multipart/form-data'
 // 添加请求拦截器，在请求头中加token
 axios.interceptors.request.use(
   config => {
