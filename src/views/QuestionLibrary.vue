@@ -1,6 +1,6 @@
 <template>
   <div class="question-library">
-    <question-library-list  @changeList="$event => id = $event"></question-library-list>
+    <question-library-list @changeList="$event => id = $event"></question-library-list>
     <question-bank :type="type" :page="page" :id="id">
     </question-bank>
   </div>
@@ -25,9 +25,15 @@ export default {
   created() {
     this.getId()
   },
-  watch: {},
+  watch: {
+    id(newVal) {
+      if (newVal !== null) {
+        this.changeshowType()
+      }
+    }
+  },
   methods: {
-    getId () {
+    getId() {
       this.id = this.$store.state.questionListId
       if (this.id) {
         this.type = "QUESTION_LIST"
@@ -35,12 +41,13 @@ export default {
       console.log(this.id)
     },
     // 默认获取题库的信息
-    async fetchData () {
+    async fetchData() {
       // 调用获取题库的接口
       // { this.questionList: res.data } = await
     },
     // 切换题目展示类型
-    changeshowType () {
+    changeshowType() {
+      this.type = 'QUESTION_LIST'
     },
   }
 }
