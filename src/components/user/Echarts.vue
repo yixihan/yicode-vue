@@ -11,10 +11,19 @@ export default {
       default: () => {
         return {}
       }
-    }
+    },
+    flag: {
+      type: Boolean,
+      default: true,
+    },
   },
   mounted () {
     this.echartsInit()
+  },
+  watch: {
+    flag (val) {
+      this.$echarts.init(document.getElementById('charts')).setOption(this.config)
+    }
   },
   methods: {
     //初始化echarts

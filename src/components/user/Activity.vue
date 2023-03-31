@@ -2,22 +2,22 @@
   <div class="activity">
     <div class="row">
       <div class="col">
-        <span>总评论数</span>
-        <span>123</span>
+        <span>提交通过率</span>
+        <span>{{ userRate.acceptedCommitRate }}%</span>
       </div>
       <div class="col">
-        <span>总题解数</span>
-        <span>123</span>
+        <span>简单题通过率</span>
+        <span>{{ userRate.acceptedEasyQuestionRate }}%</span>
       </div>
     </div>
     <div class="row">
       <div class="col">
-        <span>总提交数</span>
-        <span>123</span>
+        <span>中等题通过率</span>
+        <span>{{ userRate.acceptedHardQuestionRate }}%</span>
       </div>
       <div class="col">
-        <span>总通过数</span>
-        <span>123</span>
+        <span>困难题通过率</span>
+        <span>{{ userRate.acceptedMediumQuestionRate }}%</span>
       </div>
     </div>
   </div>
@@ -25,7 +25,36 @@
 
 <script>
 export default {
-  name: "Activity"
+  name: "Activity",
+  data() {
+    return {
+      // 用户做题进度
+      userRate: {
+        "acceptedCommitRate": 0,
+        "acceptedEasyQuestionRate": 0,
+        "acceptedHardQuestionRate": 0,
+        "acceptedMediumQuestionRate": 0,
+      }
+    }
+  },
+  mounted() {
+    this.getUserQuestionRate();
+  },
+  methods: {
+    // 获取用户做题进度
+    getUserQuestionRate() {
+      this.asyncGetUserQuestionRate().then(({data}) => {
+        this.userRate = data.data
+      })
+    },
+    // 异步方法 => 获取用户做题进度
+    async asyncGetUserQuestionRate() {
+      return await this.$axios({
+        url: "/yicode-question-openapi/open/question/commit/rate",
+        method: "get",
+      });
+    },
+  }
 }
 </script>
 

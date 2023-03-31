@@ -2,47 +2,115 @@
   <div class="progress-view">
     <div class="date">
       <span class="pre">
-        <i class="el-icon-arrow-left"></i>
+        <i class="el-icon-arrow-left" @click="lastMonth"></i>
       </span>
       <span class="month">
         {{ year }} - {{ month }}
       </span>
       <span class="next">
-        <i class="el-icon-arrow-right"></i>
+        <i class="el-icon-arrow-right" @click="nextMonth"></i>
       </span>
     </div>
-    <echarts :config="progressConfig"></echarts>
+    <echarts v-if="progressConfig.series[0].data.length" :flag="freshFlag" :config="progressConfig"></echarts>
   </div>
 </template>
 
 <script>
 import Echarts from "@/components/user/Echarts.vue";
+import {successMsg} from "@/util/elementMsgUtil";
 
 export default {
   name: "ProgressView",
   components: {Echarts},
   data () {
     return  {
-      year: 2023,
-      month: 3,
+      minYear: 2023,
+      minMonth: 1,
+      maxYear: 0,
+      maxMonth: 0,
+      year: 0,
+      month: 0,
+      date: '',
+      freshFlag: true,
       progressConfig: {
+        label: {
+          show: true,
+        },
         xAxis: {
           name: "日期",
-          data: ['A', 'B', 'C', 'D', 'E']
+          data: []
         },
         yAxis: {
           name: "解题数"
         },
         series: [
           {
-            data: [10, 22, 28, 23, 19],
+            data: [],
             type: 'line',
             smooth: true
           }
         ]
       }
     }
-  }
+  },
+  created() {
+    const now = new Date();
+    this.month = now.getMonth() + 1
+    this.year = now.getFullYear()
+    this.maxMonth = now.getMonth() + 1
+    this.maxYear = now.getFullYear()
+    this.getUserCommitRecords()
+  },
+  methods: {
+    lastMonth() {
+      if (this.year === this.minYear && this.month === this.minMonth) {
+        successMsg("前面没有数据捏")
+        return
+      }
+      if (this.month === 1) {
+        this.month = 12;
+        this.year--
+      } else {
+        this.month--;
+      }
+      this.date = this.year + '-' + this.month
+      this.getUserCommitRecords()
+    },
+    nextMonth() {
+      if (this.year === this.maxYear && this.month === this.maxMonth) {
+        successMsg("后面没有数据捏")
+        return
+      }
+      if (this.month === 12) {
+        this.month = 1;
+        this.year++
+      } else {
+        this.month++;
+      }
+      this.date = this.year + '-' + this.month
+      this.getUserCommitRecords()
+    },
+    // 获取用户提交次数记录
+    getUserCommitRecords(){
+      this.asyncGetUserCommitRecords().then(({data}) => {
+        this.progressConfig.xAxis.data = []
+        this.progressConfig.series[0].data = []
+        data.data.forEach(item => {
+          this.progressConfig.xAxis.data.push(item.date)
+          this.progressConfig.series[0].data.push(item.count)
+
+        })
+        this.freshFlag = !this.freshFlag
+      })
+    },
+    // 异步方法 => 获取用户提交次数记录
+    async asyncGetUserCommitRecords() {
+      return await this.$axios({
+        url: "/yicode-question-openapi/open/question/commit/result/count?month=" + this.date,
+        method: "get",
+      });
+    },
+  },
 }
 </script>
 

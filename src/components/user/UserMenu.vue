@@ -2,19 +2,19 @@
   <div class="user-menu">
     <div class="user-info">
       <div class="avatar">
-        <img :src="userInfo.userAvatar" alt=""/>
+        <img :src="userAvatar" alt=""/>
       </div>
       <div class="user-name">
-        {{ userInfo.userName }}
+        {{ userName }}
       </div>
       <div class="follow">
         <div>
           <span>关注</span>
-          <span>{{ userInfo.followNum }}</span>
+          <span>{{ followNum }}</span>
         </div>
         <div>
           <span>关注者</span>
-          <span>{{ userInfo.beFollowNum }}</span>
+          <span>{{ beFollowNum }}</span>
         </div>
       </div>
     </div>
@@ -22,7 +22,7 @@
       <router-link :to="'/userCenter/center/' + $store.getters.getUserId">首页</router-link>
       <router-link to="/userCenter/select">收藏</router-link>
       <router-link to="/userCenter/progress">进度</router-link>
-      <router-link to="/userCenter/release">发布</router-link>
+<!--      <router-link to="/userCenter/release">发布</router-link>-->
       <router-link to="/userCenter/follow">关注</router-link>
       <router-link to="/userCenter/setting">设置</router-link>
     </nav>
@@ -34,13 +34,16 @@ export default {
   name: "UserMenu",
   data () {
     return {
-      userInfo: {
-        userName: '彤彤',
-        userAvatar: require('@/assets/img/login_back.png'),
-        followNum: 123,
-        beFollowNum: 456,
-      }
+      userName: '彤彤',
+      userAvatar: require('@/assets/img/login_back.png'),
+      followNum: 123,
+      beFollowNum: 456,
     }
+  },
+  mounted() {
+    this.userName = this.$store.getters.getUser.userName
+    this.userAvatar = this.$store.getters.getUserInfo.userAvatar
+
   }
 }
 </script>

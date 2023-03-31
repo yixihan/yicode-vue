@@ -1,14 +1,14 @@
 <template>
   <div class="language-skill">
     <div class="language">
-      <div v-for="(item, index) in data" :key="index">
-        <span class="name">{{ item.name }}</span>
+      <div v-for="(item, index) in websiteList" :key="index">
+        <span class="name">{{ item.language }}</span>
         <span>通过数: </span>
-        <span class="num">{{ item.num }}</span>
+        <span class="num">{{ item.dealCount }}</span>
       </div>
     </div>
     <div class="skill">
-      <span v-for="(item, index) in labelList" :key="index">{{ item.text }}</span>
+      <span v-for="(item, index) in labelList" :key="index">{{ item }}</span>
     </div>
   </div>
 </template>
@@ -18,59 +18,33 @@ export default {
   name: "languageAndSkill",
   data () {
     return {
-      data: [
+      userId: this.$store.getters.getUserId,
+      websiteList: [
         {
-          name: 'Java',
-          num: 962,
+          language: '',
+          dealCount: 0,
         },
-        {
-          name: 'JavaScript',
-          num: 962,
-        },
-        {
-          name: 'C',
-          num: 962,
-        },
-        {
-          name: 'C++',
-          num: 962,
-        },
-        {
-          name: 'Python',
-          num: 962,
-        },
-        {
-          name: 'Go',
-          num: 962,
-        }
       ],
-      labelList: [
-        {
-          text: '数组',
-        },
-        {
-          text: '二分查找',
-        },
-        {
-          text: '二叉搜索树',
-        },
-        {
-          text: '广度优先搜索',
-        },
-        {
-          text: '深度优先搜索',
-        },
-        {
-          text: '动态规划',
-        },
-        {
-          text: '位运算',
-        },
-        {
-          text: '数据库',
-        }
-      ]
+      labelList: []
     }
+  },
+  mounted() {
+    this.getUserInfo()
+  },
+  methods: {
+    getUserInfo() {
+      this.asyncGetUserInfo().then(({data}) => {
+        this.websiteList = data.data.userInfo.userLanguageList
+        this.labelList = data.data.userInfo.userLabel
+      })
+    },
+    // 异步方法 => 获取用户信息
+    async asyncGetUserInfo() {
+      return await this.$axios({
+        url: "/yicode-user-openapi/open/user/detail?userId=" + this.userId,
+        method: "get",
+      });
+    },
   }
 }
 </script>
