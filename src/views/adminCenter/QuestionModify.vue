@@ -18,6 +18,7 @@
         </el-form-item>
         <el-form-item label="标签: ">
           <el-select
+              v-show="freshFlag"
               v-model="labelValues"
               multiple
               filterable
@@ -80,13 +81,13 @@ export default {
       // 可选标签 id list
       labelIdList: [],
       // 问题标签
-      labelValues: [
-      ],
+      labelValues: [],
       // 新标签列表
       newLabelList: [],
       // 一次上次多张图片时使用
       img_file: {},
-      difficultyMap: new Map()
+      difficultyMap: new Map(),
+      freshFlag: true,
     }
   },
   mounted() {
@@ -164,7 +165,7 @@ export default {
     // 修改题目
     modifyQuestion() {
       // 分割新标签与老标签
-      for (let i = 0; i < this.labelValues.length; i++){
+      for (let i = 0; i < this.labelValues.length; i++) {
         const item = this.labelValues[i];
         if (!this.labelIdList.includes(item)) {
           this.labelValues.splice(i, 1)
@@ -173,13 +174,19 @@ export default {
       }
       this.asyncModifyQuestionDetail().then(({data}) => {
         this.asyncModifyQuestionDetailLabel().then(({labelList}) => {
-          labelList.data.forEach(item => {
-            this.labelValues.push(item.labelId)
-            this.questionData = data.data
-            // 获取新的问题标签
-            this.getQuestionLabel()
-            successMsg("修改题目成功")
-          })
+          // 清空标签选择
+          this.newLabelList = []
+          this.labelValues = []
+          // 获取题目信息
+          this.questionData = data.data
+          // 获取新的问题标签
+          this.getQuestionDetailLabel()
+          this.getQuestionLabel()
+
+          this.freshFlag = false
+          this.freshFlag = true
+          successMsg("修改题目成功")
+
         })
       })
     },

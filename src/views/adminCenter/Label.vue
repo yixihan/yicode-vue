@@ -121,10 +121,10 @@ export default {
         }
       });
     },
-    // 异步方法 => 注销用户
+    // 异步方法 => 删除标签
     async asyncDelLabel(labelId) {
       return await this.$axios({
-        url: "/yicode-user-openapi/open/label/del",
+        url: "/yicode-question-openapi/open/label/del",
         method: "delete",
         data: [labelId]
       });
