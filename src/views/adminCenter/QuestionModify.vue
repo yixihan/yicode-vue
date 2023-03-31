@@ -20,6 +20,9 @@
           <el-select
               v-model="labelValues"
               multiple
+              filterable
+              allow-create
+              default-first-option
               collapse-tags
               placeholder="请选择">
             <el-option
@@ -42,8 +45,8 @@
           v-model="questionData.questionDesc"
           ref="md"
           @save="modifyQuestion"
-          @imgAdd="$imgAdd"
-          @imgDel="$imgDel"
+          @imgAdd="imgAdd"
+          @imgDel="imgDel"
       />
     </div>
     <el-button type="primary" @click="modifyQuestion">确认修改</el-button>
@@ -52,6 +55,7 @@
 
 <script>
 import {uuid} from "@/util/uuidUtil";
+import {successMsg} from "@/util/elementMsgUtil";
 
 export default {
   name: "QuestionModify",
@@ -73,57 +77,22 @@ export default {
           labelName: '',
         }
       ],
+      // 可选标签 id list
+      labelIdList: [],
       // 问题标签
-      labelValues: [],
-      link: "",
-      img_file: {}, // 一次上次多张图片时使用
-      /* 新建类型 */
-      // 文件列表
-      activeName: "",
-      // 添加文件
-      showEditModal: false,
-      // 菜单栏
-      toolbars: {
-        bold: true, // 粗体
-        italic: true, // 斜体
-        header: true, // 标题
-        underline: true, // 下划线
-        strikethrough: true, // 中划线
-        mark: true, // 标记
-        superscript: true, // 上角标
-        subscript: true, // 下角标
-        quote: true, // 引用
-        ol: true, // 有序列表
-        ul: true, // 无序列表
-        link: true, // 链接
-        imagelink: true, // 图片链接
-        code: true, // code
-        table: true, // 表格
-        fullscreen: true, // 全屏编辑
-        readmodel: true, // 沉浸式阅读
-        htmlcode: true, // 展示html源码
-        help: true, // 帮助
-        /* 1.3.5 */
-        undo: true, // 上一步
-        redo: true, // 下一步
-        trash: true, // 清空
-        save: true, // 保存（触发events中的save事件）
-        /* 1.4.2 */
-        navigation: true, // 导航目录
-        /* 2.1.8 */
-        alignleft: true, // 左对齐
-        aligncenter: true, // 居中
-        alignright: true, // 右对齐
-        /* 2.2.1 */
-        subfield: true, // 单双栏模式
-        preview: true, // 预览
-      },
+      labelValues: [
+      ],
+      // 新标签列表
+      newLabelList: [],
+      // 一次上次多张图片时使用
+      img_file: {},
       difficultyMap: new Map()
     }
   },
   mounted() {
     this.getQuestionDetail();
     this.getQuestionLabel();
+    this.getQuestionDetailLabel()
     // 如果原始md字符串中存在曾上传的图片， 则需要将对应<img>中的src替换为base64
     this.$nextTick(() => {
       // $vm.$imgUpdateByUrl 详情见本页末尾
@@ -154,16 +123,17 @@ export default {
     getQuestionLabel() {
       this.asyncGetQuestionLabel().then(({data}) => {
         this.labelOptions = data.data
+        data.data.forEach(item => {
+          this.labelIdList.push(item.labelId)
+        })
       })
     },
     // md => 删除图片
-    //
-    $imgDel(pos) {
+    imgDel(pos) {
       delete this.img_file[pos];
     },
     // md => 添加图片
-    // 绑定@imgAdd event
-    $imgAdd(pos, $file) {
+    imgAdd(pos, $file) {
       const formData = new FormData();
       // 第一步, 获取上传凭证.
       this.$axios({
@@ -191,9 +161,34 @@ export default {
         })
       });
     },
+    // 修改题目
     modifyQuestion() {
+      // 分割新标签与老标签
+      for (let i = 0; i < this.labelValues.length; i++){
+        const item = this.labelValues[i];
+        if (!this.labelIdList.includes(item)) {
+          this.labelValues.splice(i, 1)
+          this.newLabelList.push(item)
+        }
+      }
       this.asyncModifyQuestionDetail().then(({data}) => {
-        this.questionData = data.data
+        this.asyncModifyQuestionDetailLabel().then(({labelList}) => {
+          labelList.data.forEach(item => {
+            this.labelValues.push(item.labelId)
+            this.questionData = data.data
+            // 获取新的问题标签
+            this.getQuestionLabel()
+            successMsg("修改题目成功")
+          })
+        })
+      })
+    },
+    // 获取该问题的标签
+    getQuestionDetailLabel() {
+      this.asyncGetQuestionDetailLabel().then(({data}) => {
+        data.data.forEach(item => {
+          this.labelValues.push(item.labelId)
+        })
       })
     },
     // 异步方法 => 获取题目详情
@@ -203,7 +198,7 @@ export default {
         method: "get",
       });
     },
-    // 异步方法 => 修改该问题的标签
+    // 异步方法 => 修改题目
     async asyncModifyQuestionDetail() {
       return await this.$axios({
         url: "/yicode-question-openapi/open/question/modify",
@@ -227,8 +222,13 @@ export default {
     // 异步方法 => 修改该问题的标签
     async asyncModifyQuestionDetailLabel() {
       return await this.$axios({
-        url: "/yicode-question-openapi/open/question/detail",
+        url: "/yicode-question-openapi/open/question/label/modify",
         method: "post",
+        data: {
+          "questionId": this.questionData.questionId,
+          "labelIdList": this.labelValues,
+          "labelNameList": this.newLabelList
+        }
       });
     },
     // 异步方法 => 获取所有题目标签
@@ -238,6 +238,7 @@ export default {
         method: "get",
       });
     },
+    // 异步方法 => 上传图片至 OSS
     async asyncUploadImg(data) {
       return await this.$axios({
         url: "https://yicode.oss-cn-chengdu.aliyuncs.com",
@@ -246,24 +247,7 @@ export default {
           "Content-Type": "multipart/form-data"
         },
         data: data
-      }).catch((res) => {
-        console.log(res)
       })
-    },
-    exportRaw(name, data) {
-      const urlObject = window.URL || window.webkitURL || window;
-      const exportBlob = new Blob([data]);
-      const saveLink = document.createElementNS('http://www.w3.org/1999/xhtml', 'a');
-      this.link = saveLink
-      console.log(this.link)
-      saveLink.href = urlObject.createObjectURL(exportBlob)
-      saveLink.download = name
-      this.fakeClick(saveLink)
-    },
-    fakeClick(obj) {
-      const ev = document.createEvent('MouseEvents');
-      ev.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null)
-      obj.dispatchEvent(ev)
     },
   }
 }
