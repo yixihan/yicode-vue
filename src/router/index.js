@@ -107,6 +107,11 @@ const routes = [
             component: () => import("@/views/userCenter/Select.vue")
           },
           {
+            path: "/userCenter/select-detail/:id",
+            name: "UserCenterSelectDetail",
+            component: () => import("@/views/userCenter/SelectDetails.vue")
+          },
+          {
             path: "/userCenter/progress",
             name: "UserCenterProgress",
             component: () => import("@/views/userCenter/Progress.vue")

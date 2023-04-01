@@ -25,7 +25,43 @@
 
 <script>
 export default {
-  name: "Follow"
+  name: "Follow",
+  data() {
+    return {
+      followData: {
+        current: 1,
+        total: 0,
+        size: 10,
+        pages: 0,
+        records: []
+      },
+      fanData: {
+        current: 1,
+        total: 0,
+        size: 10,
+        pages: 0,
+        records: []
+      },
+    }
+  },
+  mounted() {
+  },
+  methods: {
+    // 异步方法 => 获取问题数量情况
+    async asyncGetQuestionCount() {
+      return await this.$axios({
+        url: "/yicode-question-openapi/open/question/all/count",
+        method: "get",
+      });
+    },
+    // 异步方法 => 获取用户做题进度
+    async asyncGetUserQuestionRate() {
+      return await this.$axios({
+        url: "/yicode-question-openapi/open/question/commit/rate",
+        method: "get",
+      });
+    }
+  }
 }
 </script>
 
@@ -34,6 +70,7 @@ export default {
   .info {
     display: flex;
     flex-direction: column;
+
     .item {
       display: flex;
       justify-content: flex-start;
@@ -43,6 +80,7 @@ export default {
       height: 50px;
       border-bottom: 1px solid #f0f0f0;
       box-sizing: border-box;
+
       .name {
         height: 50px;
         line-height: 50px;
@@ -51,6 +89,7 @@ export default {
         flex: 1;
         text-align: left;
       }
+
       button {
 
       }

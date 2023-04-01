@@ -53,15 +53,17 @@ export default {
       }
     }
   },
-  created() {
+  mounted() {
     const now = new Date();
     this.month = now.getMonth() + 1
     this.year = now.getFullYear()
     this.maxMonth = now.getMonth() + 1
     this.maxYear = now.getFullYear()
+    this.date = this.year + '-' + this.month
     this.getUserCommitRecords()
   },
   methods: {
+    // 上个月
     lastMonth() {
       if (this.year === this.minYear && this.month === this.minMonth) {
         successMsg("前面没有数据捏")
@@ -76,6 +78,7 @@ export default {
       this.date = this.year + '-' + this.month
       this.getUserCommitRecords()
     },
+    // 下个月
     nextMonth() {
       if (this.year === this.maxYear && this.month === this.maxMonth) {
         successMsg("后面没有数据捏")
@@ -98,7 +101,6 @@ export default {
         data.data.forEach(item => {
           this.progressConfig.xAxis.data.push(item.date)
           this.progressConfig.series[0].data.push(item.count)
-
         })
         this.freshFlag = !this.freshFlag
       })

@@ -1,5 +1,5 @@
 <template>
-  <div class="select">
+  <div class="select-details">
     <header>
       <el-button type="primary" @click="showAdd = true" icon="el-icon-plus" circle></el-button>
     </header>
@@ -9,16 +9,16 @@
       <el-table-column
           fixed
           align="center"
-          prop="name"
+          prop="date"
           label="收藏夹名">
       </el-table-column>
       <el-table-column
-          prop="type"
+          prop="name"
           align="center"
           label="收藏夹类型">
       </el-table-column>
       <el-table-column
-          prop="date"
+          prop="province"
           align="center"
           label="创建时间">
       </el-table-column>
@@ -56,17 +56,11 @@
 
 <script>
 export default {
-  name: "Select",
+  name: "SelectDetails",
   data () {
     return {
       showAdd: false,
-      selectList: [
-        {
-          date: '2023-01-23',
-          name: 'test',
-          type: '题目'
-        }
-      ],
+      selectList: [],
       formAdd: {
         name: ''
       }
@@ -75,7 +69,7 @@ export default {
   methods: {
     // 查看详情
     detail () {
-      this.$router.push({path: '/userCenter/select-detail/' + '1'})
+
     },
     // 修改
     modify () {}
