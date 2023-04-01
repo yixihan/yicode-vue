@@ -29,6 +29,10 @@
         <template slot-scope="scope">
           <el-button type="text"
                      size="small"
+                     @click="toQuestionInfo(scope.row.collectionId)"
+          >查看</el-button>
+          <el-button type="text"
+                     size="small"
                      style="color: red"
                      @click="delCollection(scope.row.collectionId)"
           >删除</el-button>
@@ -92,9 +96,13 @@ export default {
         this.getUserFavoriteDetail()
       })
     },
+    // 跳转题目详情
+    toQuestionInfo(questionId) {
+      let url = this.$router.resolve('/question/details/' + questionId)
+      window.open(url .href, '_blank')
+    },
     // 分页插件 => 切换页数
     handleCurrentChange(val) {
-      console.log(val)
       this.collectionData.current = val
       this.getUserFavoriteDetail()
     },
