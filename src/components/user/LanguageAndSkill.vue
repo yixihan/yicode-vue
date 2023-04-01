@@ -18,7 +18,7 @@ export default {
   name: "languageAndSkill",
   data () {
     return {
-      userId: this.$store.getters.getUserId,
+      userId: this.$route.params.userId,
       websiteList: [
         {
           language: '',

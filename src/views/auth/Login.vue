@@ -80,6 +80,7 @@ import {errorMsg, successMsg} from "@/util/elementMsgUtil";
 
 export default {
   name: "Login",
+  inject: ['reload'],
   data() {
     return {
       // 展示登录方式或注册，1 密码登录，2 邮箱登录，3 验证码登录
@@ -149,6 +150,7 @@ export default {
         })
         // 跳转到首页
         this.$router.push("/");
+        this.reload();
       }).catch(() => {
         this.getPhotoCode()
       })

@@ -1,7 +1,7 @@
 <template>
   <div class="submit-records">
     <header>
-      <span>所有提交记录</span>
+      <span @click="toRecords">所有提交记录</span>
       <i class="el-icon-arrow-right"></i>
     </header>
     <div class="list">
@@ -21,6 +21,7 @@ export default {
   name: "SubmitRecords",
   data() {
     return {
+      userId: this.$route.params.userId,
       recordData: [
         {
           id: 0,
@@ -43,6 +44,9 @@ export default {
     this.getUserQuestionCommitHistory()
   },
   methods: {
+    toRecords() {
+
+    },
     // 获取用户提交记录
     getUserQuestionCommitHistory() {
       this.asyncGetUserQuestionCommitHistory().then(({data}) => {
@@ -55,6 +59,7 @@ export default {
         url: "/yicode-question-openapi/open/question/commit/result/user",
         method: "post",
         data: {
+          "userId": this.userId,
           "commitDateSort": true,
           "pageSize": 10,
           "page": 1

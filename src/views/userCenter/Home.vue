@@ -2,7 +2,7 @@
   <div class="user-home">
     <Title :title="'概览'"></Title>
     <div class="top">
-      <speed-progress></speed-progress>
+      <speed-progress :userId="userId"></speed-progress>
       <activity></activity>
     </div>
     <Title :title="'语言/技能'"></Title>
@@ -24,7 +24,12 @@ import SubmitRecords from "@/views/userCenter/SubmitRecords.vue";
 
 export default {
   name: "Home",
-  components: {SubmitRecords, ProgressView, LanguageAndSkill, Title, Activity, SpeedProgress}
+  components: {SubmitRecords, ProgressView, LanguageAndSkill, Title, Activity, SpeedProgress},
+  data() {
+    return {
+      userId: this.$route.params.userId,
+    }
+  }
 }
 </script>
 

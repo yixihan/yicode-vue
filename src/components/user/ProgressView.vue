@@ -24,6 +24,7 @@ export default {
   components: {Echarts},
   data () {
     return  {
+      userId: this.$route.params.userId,
       minYear: 2023,
       minMonth: 1,
       maxYear: 0,
@@ -108,7 +109,8 @@ export default {
     // 异步方法 => 获取用户提交次数记录
     async asyncGetUserCommitRecords() {
       return await this.$axios({
-        url: "/yicode-question-openapi/open/question/commit/result/count?month=" + this.date,
+        url: "/yicode-question-openapi/open/question/commit/result/count?month=" + this.date
+        + "&userId=" + this.userId,
         method: "get",
       });
     },

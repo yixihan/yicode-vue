@@ -28,6 +28,7 @@ export default {
   name: "Activity",
   data() {
     return {
+      userId: this.$route.params.userId,
       // 用户做题进度
       userRate: {
         "acceptedCommitRate": 0,
@@ -50,7 +51,7 @@ export default {
     // 异步方法 => 获取用户做题进度
     async asyncGetUserQuestionRate() {
       return await this.$axios({
-        url: "/yicode-question-openapi/open/question/commit/rate",
+        url: "/yicode-question-openapi/open/question/commit/rate?userId=" + this.userId,
         method: "get",
       });
     },

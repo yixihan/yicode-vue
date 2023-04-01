@@ -30,6 +30,7 @@ import Message from "@/components/common/Message.vue";
 export default {
   name: "Header",
   components: {Message},
+  inject: ['reload'],
   data() {
     return {
       showMes: true,
@@ -54,7 +55,8 @@ export default {
     },
     // 跳转到个人中心页面
     toUserCenter() {
-      this.$router.push("/user/center/" + this.userId)
+      this.reload()
+      this.$router.push("/user/center/" + this.$store.getters.getUserId)
     },
     // 跳转到管理中心
     toAdminCenter() {
@@ -68,6 +70,7 @@ export default {
     logout() {
       this.$store.commit("removeInfo")
       this.$router.push("/");
+      this.reload();
     }
   },
 }

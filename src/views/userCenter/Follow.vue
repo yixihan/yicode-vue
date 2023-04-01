@@ -33,7 +33,17 @@ export default {
         total: 0,
         size: 10,
         pages: 0,
-        records: []
+        records: [
+          {
+            userId: 1,
+            userName: "",
+            userAvatar: "",
+            followUserId: 0,
+            followUserName: '',
+            followUserAvatar: '',
+            createTime: ""
+          }
+        ]
       },
       fanData: {
         current: 1,

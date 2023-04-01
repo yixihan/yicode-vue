@@ -31,12 +31,21 @@
     </div>
     <!-- 导航栏 -->
     <nav>
-      <router-link :to="'/user/center/' + userId">首页</router-link>
-      <router-link :to="'/user/center/' + userId + '/select'">收藏</router-link>
-      <router-link :to="'/user/center/' + userId + '/progress'">进度</router-link>
+      <router-link :to="'/user/center/' + userId"
+      >首页</router-link>
+      <router-link :to="'/user/center/' + userId + '/select'"
+                   v-show="userId === loginUserId || $store.getters.isAdmin"
+      >收藏</router-link>
+      <router-link :to="'/user/center/' + userId + '/progress'"
+                   v-show="userId === loginUserId || $store.getters.isAdmin"
+      >进度</router-link>
 <!--      <router-link to="/userCenter/release">发布</router-link>-->
-      <router-link :to="'/user/center/' + userId + '/follow'">关注</router-link>
-      <router-link :to="'/user/center/' + userId + '/setting'">设置</router-link>
+      <router-link :to="'/user/center/' + userId + '/follow'"
+                   v-show="userId === loginUserId || $store.getters.isAdmin"
+      >关注</router-link>
+      <router-link :to="'/user/center/' + userId + '/setting'"
+                   v-show="userId === loginUserId"
+      >设置</router-link>
     </nav>
   </div>
 </template>
@@ -44,6 +53,7 @@
 <script>
 export default {
   name: "UserMenu",
+  inject: ['reload'],
   props: {
     userId: {
       type: String,
@@ -52,9 +62,10 @@ export default {
   },
   data () {
     return {
-      userName: this.$store.getters.getUser.userName,
-      userAvatar: this.$store.getters.getUserInfo.userAvatar,
-      userWebsite: this.$store.getters.getUserInfo.userWebsiteList,
+      loginUserId: '',
+      userName: '',
+      userAvatar: '',
+      userWebsite: '',
       followCount: 0,
       fanCount: 0,
     }
@@ -62,16 +73,28 @@ export default {
   mounted() {
     this.getFollowCount()
     this.getFanCount()
+    this.getUserInfo()
+    this.loginUserId = this.$store.getters.getUserId +''
   },
   methods: {
+    // 获取关注用户数量
     getFollowCount() {
       this.asyncGetFollowCount().then(({data}) => {
         this.followCount = data.data
       })
     },
+    // 获取粉丝数量
     getFanCount() {
       this.asyncGetFanCount().then(({data}) => {
         this.fanCount = data.data
+      })
+    },
+    // 获取用户信息
+    getUserInfo() {
+      this.asyncGetUserInfo().then(({data}) => {
+        this.userName = data.data.user.userName
+        this.userAvatar = data.data.userInfo.userAvatar
+        this.userWebsite = data.data.userInfo.userWebsiteList
       })
     },
     // 异步方法 => 获取问题数量情况
@@ -87,7 +110,15 @@ export default {
         url: "/yicode-user-openapi/open/user/follow/fan/count?userId=" + this.userId,
         method: "get",
       });
-    }
+    },
+    // 异步方法 => 获取登录用户信息
+    async asyncGetUserInfo() {
+      return await this.$axios({
+        url: "/yicode-user-openapi/open/user/detail?userId=" + this.userId,
+        method: "get",
+      });
+    },
+
   }
 }
 </script>
