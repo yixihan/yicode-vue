@@ -235,7 +235,6 @@ export default {
         method: "delete",
       });
     },
-
   }
 }
 </script>
