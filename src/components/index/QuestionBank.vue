@@ -130,7 +130,9 @@
       <div class="question-list-main question-list-flex"
            v-if="data.records.length !== 0"
            v-for="(item, index) in data.records"
-           :key="index">
+           :key="index"
+           @click="toQuestionInfo(item.questionId)"
+      >
         <div>
           <svg v-if="item.status" t="1679325374512" class="icon" viewBox="0 0 1024 1024" version="1.1"
                xmlns="http://www.w3.org/2000/svg" p-id="2778" width="16" height="16">
@@ -321,13 +323,13 @@ export default {
   watch: {
     // 监听id变化,更新列表
     id: {
-      handler(newVal) {
+      handler() {
         // 调用接口
         this.getQuestionDetails()
       }
     },
     type: {
-      handler(newVal) {
+      handler() {
         // 调用接口
         this.getQuestionDetails()
       }
@@ -468,12 +470,10 @@ export default {
         })
       })
     },
-
     // 跳转题目详情
-    toQuestionInfo(index) {
-      console.log(index)
-      // TODO 跳转题目详情
-      // this.$router.push({path: '/admin/center/detail', query: {id: this.data.records[index].questionId}})
+    toQuestionInfo(questionId) {
+      let url = this.$router.resolve('/question/details/' + questionId)
+      window.open(url .href, '_blank')
     },
     // 异步方法 => 获取题目列表
     async asyncGetQuestion(paging) {

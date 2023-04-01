@@ -45,7 +45,7 @@ export default {
         return
       }
       let item = this.dailyQuestion[data]
-      console.log("选中问题 id :", item.questionId)
+      this.toQuestionInfo(item.questionId)
     },
     changeDate(data) {
       // 时间格式转换
@@ -59,9 +59,10 @@ export default {
     clickToday(data) {
       // console.log(data) // 跳到了本月
     },
-    // 展示完成打卡的日期
-    showFinish(data) {
-      // 修改日期格式
+    // 跳转题目详情
+    toQuestionInfo(questionId) {
+      let url = this.$router.resolve('/question/details/' + questionId)
+      window.open(url .href, '_blank')
     },
     // 数据刷新
     freshData() {

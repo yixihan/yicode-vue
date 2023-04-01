@@ -55,6 +55,17 @@
               align="center"
               :formatter="formatter">
           </el-table-column>
+          <el-table-column
+              fixed="right"
+              align="center"
+              label="操作">
+            <template slot-scope="scope">
+              <el-button type="text"
+                         size="small"
+                         @click="toQuestionInfo(scope.row.questionId)"
+              >查看</el-button>
+            </template>
+          </el-table-column>
         </el-table>
         <!-- 分页插件 -->
         <div class="block">
@@ -227,6 +238,11 @@ export default {
       }
 
       this.getUserQuestionCommitHistory()
+    },
+    // 跳转题目详情
+    toQuestionInfo(questionId) {
+      let url = this.$router.resolve('/question/details/' + questionId)
+      window.open(url .href, '_blank')
     },
     // 分页插件 => 切换每页展示数量
     handleSizeChange(val) {

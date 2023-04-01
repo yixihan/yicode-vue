@@ -2,10 +2,10 @@
 <div class="question-details">
   <div class="question-details-left">
     <el-tabs v-model="rightShow" @tab-click="handleClick">
-      <el-tab-pane label="题目描述" name="first">
-        <question-detail :questionId="100000000" :edit="false"></question-detail>
+      <el-tab-pane label="题目描述" name="desc">
+        <question-detail :questionId="questionId" :edit="false"></question-detail>
       </el-tab-pane>
-      <el-tab-pane label="评论" name="second">
+      <el-tab-pane label="评论" name="comment">
         <mavon-editor
             v-model="common"
             :toolbarsFlag="false"
@@ -27,8 +27,8 @@
           </el-pagination>
         </div>
       </el-tab-pane>
-      <el-tab-pane label="题解" name="third">评论</el-tab-pane>
-      <el-tab-pane label="提交记录" name="fourth">评论</el-tab-pane>
+      <el-tab-pane label="题解" name="note">题解</el-tab-pane>
+      <el-tab-pane label="提交记录" name="record">提交记录</el-tab-pane>
     </el-tabs>
   </div>
   <div class="question-details-right">
@@ -47,7 +47,8 @@ export default {
   components: {CommonSon, Common, QuestionDetail},
   data () {
     return {
-      rightShow: 'second',
+      rightShow: 'desc',
+      questionId: this.$route.params.questionId,
       common: '',
       showCommonSon: false
     }
