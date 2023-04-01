@@ -1,12 +1,15 @@
 <template>
   <div class="user-menu">
     <div class="user-info">
+      <!-- 头像 -->
       <div class="avatar">
         <img :src="userAvatar" alt=""/>
       </div>
+      <!-- 用户名 -->
       <div class="user-name">
         {{ userName }}
       </div>
+      <!-- 关注 -->
       <div class="follow">
         <div>
           <span>关注</span>
@@ -17,6 +20,7 @@
           <span>{{ fanCount }}</span>
         </div>
       </div>
+      <!-- 个人网站 -->
       <div class="web">
         <h4>个人网站</h4>
         <a v-for="(item, index) in userWebsite"
@@ -25,13 +29,14 @@
         >{{ item }}</a>
       </div>
     </div>
+    <!-- 导航栏 -->
     <nav>
-      <router-link :to="'/userCenter/center/' + userId">首页</router-link>
-      <router-link to="/userCenter/select">收藏</router-link>
-      <router-link to="/userCenter/progress">进度</router-link>
+      <router-link :to="'/user/center/' + userId">首页</router-link>
+      <router-link :to="'/user/center/' + userId + '/select'">收藏</router-link>
+      <router-link :to="'/user/center/' + userId + '/progress'">进度</router-link>
 <!--      <router-link to="/userCenter/release">发布</router-link>-->
-      <router-link to="/userCenter/follow">关注</router-link>
-      <router-link to="/userCenter/setting">设置</router-link>
+      <router-link :to="'/user/center/' + userId + '/follow'">关注</router-link>
+      <router-link :to="'/user/center/' + userId + '/setting'">设置</router-link>
     </nav>
   </div>
 </template>
@@ -39,9 +44,14 @@
 <script>
 export default {
   name: "UserMenu",
+  props: {
+    userId: {
+      type: String,
+      default: '',
+    }
+  },
   data () {
     return {
-      userId: this.$store.getters.getUserId,
       userName: this.$store.getters.getUser.userName,
       userAvatar: this.$store.getters.getUserInfo.userAvatar,
       userWebsite: this.$store.getters.getUserInfo.userWebsiteList,

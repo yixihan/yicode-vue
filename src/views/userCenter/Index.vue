@@ -1,6 +1,6 @@
 <template>
   <div class="user-index">
-    <user-menu></user-menu>
+    <user-menu :userId="userId"></user-menu>
     <router-view></router-view>
   </div>
 </template>
@@ -10,7 +10,12 @@ import UserMenu from "@/components/user/UserMenu.vue";
 
 export default {
   name: "UserCenterIndex",
-  components: {UserMenu}
+  components: {UserMenu},
+  data() {
+    return {
+      userId: this.$route.params.userId
+    }
+  }
 }
 </script>
 

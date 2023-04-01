@@ -32,7 +32,10 @@ export default {
   components: {Message},
   data() {
     return {
-      showMes: true
+      showMes: true,
+      isLogin: this.$store.getters.isLogin,
+      isAdmin: this.$store.getters.isAdmin,
+      userId: this.$store.getters.getUserId
     };
   },
   methods: {
@@ -51,7 +54,7 @@ export default {
     },
     // 跳转到个人中心页面
     toUserCenter() {
-      this.$router.push("/userCenter/center/" + this.$store.getters.getUserId)
+      this.$router.push("/user/center/" + this.userId)
     },
     // 跳转到管理中心
     toAdminCenter() {
@@ -66,21 +69,7 @@ export default {
       this.$store.commit("removeInfo")
       this.$router.push("/");
     }
-
   },
-  computed: {
-    isLogin() {
-      return this.$store.getters.getAccessToken !== null
-          && this.$store.getters.getAccessToken !== ""
-    },
-    isAdmin() {
-      return this.$store.getters.getUserRoleList !== null
-          && this.$store.getters.getUserRoleList !== ""
-          && this.$store.getters.getUserRoleList !== []
-          && this.$store.getters.getUserRoleList
-              .some(item => item.roleName !== "USER")
-    }
-  }
 }
 </script>
 

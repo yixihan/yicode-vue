@@ -92,42 +92,42 @@ const routes = [
       },
       // user
       {
-        path: "/",
+        path: "/user/center/:userId",
         name: "UserCenter",
         component: () => import("@/views/userCenter/Index.vue"),
         children: [
           {
-            path: "/userCenter/center/:id",
+            path: "/user/center/:userId",
             name: "UserCenterHome",
             component: () => import("@/views/userCenter/Home.vue")
           },
           {
-            path: "/userCenter/select",
+            path: "/user/center/:userId/select",
             name: "UserCenterSelect",
             component: () => import("@/views/userCenter/Select.vue")
           },
           {
-            path: "/userCenter/select-detail/:id",
+            path: "/user/center/:userId/select/detail/:id",
             name: "UserCenterSelectDetail",
             component: () => import("@/views/userCenter/SelectDetails.vue")
           },
           {
-            path: "/userCenter/progress",
+            path: "/user/center/:userId/progress",
             name: "UserCenterProgress",
             component: () => import("@/views/userCenter/Progress.vue")
           },
           {
-            path: "/userCenter/release",
+            path: "/user/center/:userId/release",
             name: "UserCenterRelease",
             component: () => import("@/views/userCenter/Release.vue")
           },
           {
-            path: "/userCenter/follow",
+            path: "/user/center/:userId/follow",
             name: "UserCenterFollow",
             component: () => import("@/views/userCenter/Follow.vue")
           },
           {
-            path: "/userCenter/setting",
+            path: "/user/center/:userId/setting",
             name: "UserCenterSetting",
             component: () => import("@/views/userCenter/Setting.vue")
           }

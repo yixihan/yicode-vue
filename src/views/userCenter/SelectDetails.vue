@@ -1,7 +1,10 @@
 <template>
   <div class="select-details">
     <header>
-      <el-button type="primary" @click="showAdd = true" icon="el-icon-plus" circle></el-button>
+      <div class="back" @click="goBack()">
+        <i class="el-icon-arrow-left"></i>
+        <span>返回</span>
+      </div>
     </header>
     <el-table
         :data="selectList"
@@ -59,20 +62,15 @@ export default {
   name: "SelectDetails",
   data () {
     return {
-      showAdd: false,
-      selectList: [],
-      formAdd: {
-        name: ''
-      }
+      userId: this.$route.params.userId,
     }
   },
   methods: {
-    // 查看详情
-    detail () {
-
+    // 返回
+    goBack() {
+      this.$router.push("/user/center/" + this.userId + "/select/")
     },
-    // 修改
-    modify () {}
+
   }
 }
 </script>
@@ -83,10 +81,28 @@ export default {
     height: 50px;
     line-height: 50px;
     width: 100%;
+    background: #99a9bf;
     position: relative;
-    button {
+
+    .back {
+      position: absolute;
+      left: 5px;
+      top: 0;
+      cursor: pointer;
+    }
+
+    & > i {
       position: absolute;
       right: 20px;
+      top: 13px;
+      font-size: 24px;
+      font-weight: bolder;
+      transition: all 0.3s;
+      cursor: pointer;
+
+      &:hover {
+        color: #FFFFFF;
+      }
     }
   }
   .el-table {
