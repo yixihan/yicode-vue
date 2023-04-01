@@ -93,6 +93,7 @@ export default {
   components: {SpeedProgress},
   data() {
     return {
+      userId: this.$route.params.userId,
       userRate: {
         acceptedQuestion: 0,
         unAcceptedQuestion: 0,
@@ -243,6 +244,7 @@ export default {
         url: "/yicode-question-openapi/open/question/commit/result/user",
         method: "post",
         data: {
+          "userId": this.userId,
           "accepted": this.stateValue,
           "questionName": this.search,
           "questionDifficulty": this.difficultyValue,
@@ -256,7 +258,7 @@ export default {
     // 异步方法 => 获取用户做题进度
     async asyncGetUserQuestionRate() {
       return await this.$axios({
-        url: "/yicode-question-openapi/open/question/commit/rate",
+        url: "/yicode-question-openapi/open/question/commit/rate?userId=" + this.userId,
         method: "get",
       });
     },
