@@ -7,6 +7,7 @@
     <div class="list">
       <div class="list-item"
            v-for="(item, index) in recordData"
+           @click="toQuestionInfo(item.questionId)"
            :key="index"
       >
         <div class="question">{{ item.questionName }}</div>
@@ -52,6 +53,11 @@ export default {
       this.asyncGetUserQuestionCommitHistory().then(({data}) => {
         this.recordData = data.data.records
       })
+    },
+    // 跳转题目详情
+    toQuestionInfo(questionId) {
+      let url = this.$router.resolve('/question/details/' + questionId)
+      window.open(url .href, '_blank')
     },
     // 异步方法 => 获取用户提交记录
     async asyncGetUserQuestionCommitHistory() {
