@@ -28,6 +28,7 @@
       </el-table-column>
       <el-table-column
           prop="questionDifficulty"
+          :formatter="difficultyFormatter"
           label="难度"
       >
       </el-table-column>
@@ -196,34 +197,6 @@ export default {
     this.getQuestionPage()
   },
   methods: {
-    // 设置题目难度颜色
-    difficultyStyle({row, column}) {
-      if (column.label === '难度') {
-        let style;
-        switch (row.questionDifficulty) {
-          case '困难': {
-            style = 'color: #ff2d55'
-            break;
-          }
-          case '中等': {
-            style = 'color: #ffb800'
-            break;
-          }
-          case '简单': {
-            style = 'color: #00af9b'
-            break;
-          }
-          default:
-            style = ''
-        }
-
-        return style
-      }
-    },
-    // 通过率增加 %
-    rateFormatter(row) {
-      return row.passRate + '%'
-    },
     // 返回
     goBack() {
       this.$router.push({path: "/admin/center/list"})
@@ -282,6 +255,42 @@ export default {
         this.isShowDelQues = false
         this.getQuestionPage()
       })
+    },
+    // 样式设置 => 题目难度
+    difficultyStyle({row, column}) {
+      if (column.label === '难度') {
+        let style;
+        switch (row.questionDifficulty) {
+          case 'HARD': {
+            style = 'color: #ff2d55'
+            break;
+          }
+          case 'MEDIUM': {
+            style = 'color: #ffb800'
+            break;
+          }
+          case 'EASY': {
+            style = 'color: #00af9b'
+            break;
+          }
+          default:
+            style = ''
+        }
+
+        return style
+      }
+    },
+    // 格式化 => 通过率
+    rateFormatter(row) {
+      return row.passRate + '%'
+    },
+    // 格式化 => 题目难度
+    difficultyFormatter(row) {
+      switch (row.questionDifficulty) {
+        case 'EASY': return '简单'
+        case 'MEDIUM': return '中等'
+        case 'HARD': return '困难'
+      }
     },
     // 分页插件 => 切换每页展示数量
     handleSizeChange(val) {

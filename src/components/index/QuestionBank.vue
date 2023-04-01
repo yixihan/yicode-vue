@@ -147,7 +147,9 @@
         <div>{{ item.successCount }}</div>
         <div>{{ item.noteCount }}</div>
         <div>{{ item.passRate }}%</div>
-        <div :style="'color: ' + getDifficultyColor(item.questionDifficulty)">
+        <div :style="difficultyStyle(item.questionDifficulty)"
+             v-text="difficultyFormatter(item.questionDifficulty)"
+        >
           {{ item.questionDifficulty }}
         </div>
       </div>
@@ -444,6 +446,41 @@ export default {
       }
       // 按要求进行排序
       this.getQuestionDetails()
+    },
+    // 样式设置 => 题目难度
+    difficultyStyle(questionDifficulty) {
+      let style;
+      switch (questionDifficulty) {
+        case 'HARD': {
+          style = 'color: #ff2d55'
+          break;
+        }
+        case 'MEDIUM': {
+          style = 'color: #ffb800'
+          break;
+        }
+        case 'EASY': {
+          style = 'color: #00af9b'
+          break;
+        }
+        default:
+          style = ''
+      }
+
+      return style
+
+    },
+    // 格式化 => 通过率
+    rateFormatter(row) {
+      return row.passRate + '%'
+    },
+    // 格式化 => 题目难度
+    difficultyFormatter(questionDifficulty) {
+      switch (questionDifficulty) {
+        case 'EASY': return '简单'
+        case 'MEDIUM': return '中等'
+        case 'HARD': return '困难'
+      }
     },
     // 分页插件 => 切换每页展示数量
     handleSizeChange(val) {

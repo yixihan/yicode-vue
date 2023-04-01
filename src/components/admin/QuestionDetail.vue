@@ -9,10 +9,11 @@
         </div>
       </div>
       <div class="function">
-        <!-- 点赞 -->
+        <!-- 难度 -->
         <div class="difficulty">
           <span>难度:  </span>
-          <span>{{ questionData.questionDifficulty }}</span>
+          <span :style="difficultyStyle(questionData.questionDifficulty)"
+                v-text="difficultyFormatter(questionData.questionDifficulty)"></span>
         </div>
         <!-- 点赞 -->
         <div class="like">
@@ -129,6 +130,44 @@ export default {
         }
       })
     },
+    // 样式设置 => 题目难度
+    difficultyStyle(questionDifficulty) {
+      let style;
+      switch (questionDifficulty) {
+        case 'HARD': {
+          style = 'color: #ff2d55'
+          break;
+        }
+        case 'MEDIUM': {
+          style = 'color: #ffb800'
+          break;
+        }
+        case 'EASY': {
+          style = 'color: #00af9b'
+          break;
+        }
+        default:
+          style = ''
+      }
+
+      return style
+
+    },
+    // 格式化 => 通过率
+    rateFormatter(row) {
+      return row.passRate + '%'
+    },
+    // 格式化 => 题目难度
+    difficultyFormatter(questionDifficulty) {
+      switch (questionDifficulty) {
+        case 'EASY':
+          return '简单'
+        case 'MEDIUM':
+          return '中等'
+        case 'HARD':
+          return '困难'
+      }
+    },
     // 异步方法 => 获取题目详情
     async asyncGetQuestionDetail() {
       return await this.$axios({
@@ -162,15 +201,18 @@ export default {
     text-align: left;
     cursor: default;
     background: #ffffff;
+
     .name {
       height: 30px;
       line-height: 30px;
       width: 100%;
       font-weight: bolder;
       position: relative;
+
       span {
         font-size: 32px;
       }
+
       .function {
         position: absolute;
         top: 0;

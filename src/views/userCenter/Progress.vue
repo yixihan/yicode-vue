@@ -31,11 +31,13 @@
         <!-- 数据展示 -->
         <el-table
             :data="recordData.records"
+            style="width: 100%"
             :cell-style="difficultyStyle"
             :stripe="true"
             :border="true"
             @sort-change="sortQuestion"
-            style="width: 100%"
+            size="small"
+            border
         >
           <el-table-column
               prop="createTime"
@@ -53,7 +55,7 @@
               prop="questionDifficulty"
               label="难度"
               align="center"
-              :formatter="formatter">
+              :formatter="difficultyFormatter">
           </el-table-column>
           <el-table-column
               fixed="right"
@@ -105,6 +107,7 @@ export default {
   data() {
     return {
       userId: this.$route.params.userId,
+      // 做题进度
       userRate: {
         acceptedQuestion: 0,
         unAcceptedQuestion: 0,
@@ -184,48 +187,22 @@ export default {
     this.getUserQuestionRate()
   },
   methods: {
+    // 跳转题目详情
+    toQuestionInfo(questionId) {
+      let url = this.$router.resolve('/question/details/' + questionId)
+      window.open(url .href, '_blank')
+    },
     // 获取用户提交记录
     getUserQuestionCommitHistory() {
       this.asyncGetUserQuestionCommitHistory().then(({data}) => {
         this.recordData = data.data
       })
     },
+    // 获取用户做题进度
     getUserQuestionRate() {
       this.asyncGetUserQuestionRate().then(({data}) => {
         this.userRate = data.data
       })
-    },
-    // formatter => 题目难度
-    formatter(row) {
-      switch (row.questionDifficulty) {
-        case 'EASY': return '简单'
-        case 'MEDIUM': return '中等'
-        case 'HARD': return '困难'
-      }
-    },
-    // 设置题目难度颜色
-    difficultyStyle({row, column}) {
-      if (column.label === '难度') {
-        let style;
-        switch (row.questionDifficulty) {
-          case '困难': {
-            style = 'color: #ff2d55'
-            break;
-          }
-          case '中等': {
-            style = 'color: #ffb800'
-            break;
-          }
-          case '简单': {
-            style = 'color: #00af9b'
-            break;
-          }
-          default:
-            style = ''
-        }
-
-        return style
-      }
     },
     // 排序方法
     sortQuestion(column) {
@@ -239,10 +216,41 @@ export default {
 
       this.getUserQuestionCommitHistory()
     },
-    // 跳转题目详情
-    toQuestionInfo(questionId) {
-      let url = this.$router.resolve('/question/details/' + questionId)
-      window.open(url .href, '_blank')
+    // 样式设置 => 题目难度
+    difficultyStyle({row, column}) {
+      if (column.label === '难度') {
+        let style;
+        switch (row.questionDifficulty) {
+          case 'HARD': {
+            style = 'color: #ff2d55'
+            break;
+          }
+          case 'MEDIUM': {
+            style = 'color: #ffb800'
+            break;
+          }
+          case 'EASY': {
+            style = 'color: #00af9b'
+            break;
+          }
+          default:
+            style = ''
+        }
+
+        return style
+      }
+    },
+    // 格式化 => 通过率
+    rateFormatter(row) {
+      return row.passRate + '%'
+    },
+    // 格式化 => 题目难度
+    difficultyFormatter(row) {
+      switch (row.questionDifficulty) {
+        case 'EASY': return '简单'
+        case 'MEDIUM': return '中等'
+        case 'HARD': return '困难'
+      }
     },
     // 分页插件 => 切换每页展示数量
     handleSizeChange(val) {
