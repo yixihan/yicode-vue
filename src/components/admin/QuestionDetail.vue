@@ -4,7 +4,7 @@
       <!-- 问题名 -->
       <div class="name">
         <span>{{ questionData.questionName }}</span>
-        <div class="function">
+        <div class="function" v-if="edit">
           <i class="el-icon-edit-outline" @click="goModify()"></i>
         </div>
       </div>
@@ -68,6 +68,10 @@ export default {
     questionId: {
       type: String,
       default: ''
+    },
+    edit: {
+      type: Boolean,
+      default: true,
     }
   },
   data() {
@@ -149,22 +153,24 @@ export default {
   flex: 2;
   display: flex;
   flex-direction: column;
-  padding: 20px;
-
+  //padding: 20px;
   header {
     height: 60px;
     line-height: 60px;
     border-bottom: 1px solid #e5e5e5;
+    padding: 10px 25px 0 25px;
     text-align: left;
     cursor: default;
-
+    background: #ffffff;
     .name {
       height: 30px;
       line-height: 30px;
       width: 100%;
       font-weight: bolder;
       position: relative;
-
+      span {
+        font-size: 32px;
+      }
       .function {
         position: absolute;
         top: 0;

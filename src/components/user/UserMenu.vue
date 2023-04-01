@@ -23,7 +23,9 @@
       <!-- 个人网站 -->
       <div class="web">
         <h4>个人网站</h4>
-        <a v-for="(item, index) in userWebsite"
+        <a
+            target="_blank"
+            v-for="(item, index) in userWebsite"
            :key="index"
            :href="item"
         >{{ item }}</a>

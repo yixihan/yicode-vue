@@ -42,6 +42,11 @@ const routes = [
         name: "QuestionLibrary",
         component: () => import("@/views/QuestionLibrary.vue")
       },
+      {
+        path: "/question/details/:questionId",
+        name: "QuestionDetails",
+        component: () => import("@/views/question/QuestionDetails.vue")
+      },
       // admin
       {
         path: "/admin/center",

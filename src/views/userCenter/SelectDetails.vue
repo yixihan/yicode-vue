@@ -126,7 +126,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.select {
+.select-details {
   header {
     height: 50px;
     line-height: 50px;
@@ -139,6 +139,7 @@ export default {
       left: 5px;
       top: 0;
       cursor: pointer;
+      text-align: left;
     }
 
     & > i {
