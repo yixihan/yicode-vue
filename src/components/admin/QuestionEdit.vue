@@ -155,6 +155,7 @@ export default {
       this.asyncCreateQuestionCase().then(() => {
         successMsg("添加测试用例成功")
         this.isShowAdd = false
+        this.addUseCase = {}
         this.getQuestionCase()
       })
     },

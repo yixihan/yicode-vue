@@ -109,7 +109,7 @@
         </div>
         <div class="card-item">
           <span>提交通过率 :</span>
-          <span class="num">{{ userRate.acceptedCommitRate }}</span>
+          <span class="num">{{ userRate.acceptedCommitRate }}%</span>
         </div>
       </div>
     </div>

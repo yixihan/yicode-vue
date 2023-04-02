@@ -12,7 +12,8 @@ import 'element-ui/lib/theme-chalk/index.css'
 import mavonEditor from 'mavon-editor'
 import 'mavon-editor/dist/css/index.css'
 import * as echarts from 'echarts'
-// import Bus from './util/eventBus'
+import VueCodeMirror from 'vue-codemirror'
+import 'codemirror/lib/codemirror.css'
 
 
 Vue.prototype.$echarts = echarts
@@ -27,6 +28,7 @@ Vue.use(VueAxios, axios)
 Vue.use(ElementUi)
 Vue.use(mavonEditor)
 Vue.use(router)
+Vue.use(VueCodeMirror)
 
 Vue.config.productionTip = false
 
