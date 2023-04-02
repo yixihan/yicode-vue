@@ -42,7 +42,10 @@
           label="操作"
           width="100">
         <template slot-scope="scope">
-          <el-button type="text" size="small">查看</el-button>
+          <el-button type="text"
+                     size="small"
+                     @click="toQuestionInfo(scope.row.questionId)"
+          >查看</el-button>
           <el-button type="text"
                      size="small"
                      style="color: red"
@@ -197,6 +200,11 @@ export default {
     this.getQuestionPage()
   },
   methods: {
+    // 题目详情
+    toQuestionInfo(questionId) {
+      let url = this.$router.resolve('/question/details/' + questionId)
+      window.open(url .href, '_blank')
+    },
     // 返回
     goBack() {
       this.$router.push({path: "/admin/center/list"})

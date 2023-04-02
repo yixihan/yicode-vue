@@ -305,7 +305,8 @@ export default {
     },
     // 题目详情
     toQuestionInfo(questionId) {
-      this.$router.push({path: '/admin/center/detail', query: {id: questionId}})
+      let url = this.$router.resolve('/question/details/' + questionId)
+      window.open(url .href, '_blank')
     },
     // 排序方法
     sortQuestion(column) {
