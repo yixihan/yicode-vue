@@ -86,13 +86,31 @@
     </div>
     <div class="progress-right">
       <speed-progress></speed-progress>
-      <div>
-        <span>已通过题目 : {{ userRate.acceptedQuestion }}</span><br>
-        <span>提交未通过题目 : {{ userRate.unAcceptedQuestion }}</span><br>
-        <span>未开始题目 : {{ userRate.unDoQuestion }}</span><br>
-        <span>总提交数 : {{ userRate.commitCount }}</span><br>
-        <span>通过提交数 : {{ userRate.acceptedCommitCount }}</span><br>
-        <span>提交通过率 : {{ userRate.acceptedCommitRate }}%</span><br>
+      <div class="card">
+        <div class="card-item">
+          <span>已通过题目 :</span>
+          <span class="num">{{ userRate.acceptedQuestion }}</span>
+        </div>
+        <div class="card-item">
+          <span>提交未通过题目 :</span>
+          <span class="num">{{ userRate.unAcceptedQuestion }}</span>
+        </div>
+        <div class="card-item">
+          <span>未开始题目 :</span>
+          <span class="num">{{ userRate.unDoQuestion }}</span>
+        </div>
+        <div class="card-item">
+          <span>总提交数 :</span>
+          <span class="num">{{ userRate.commitCount }}</span>
+        </div>
+        <div class="card-item">
+          <span>通过提交数 :</span>
+          <span class="num">{{ userRate.acceptedCommitCount }}</span>
+        </div>
+        <div class="card-item">
+          <span>提交通过率 :</span>
+          <span class="num">{{ userRate.acceptedCommitRate }}</span>
+        </div>
       </div>
     </div>
   </div>
@@ -322,6 +340,31 @@ export default {
     display: flex;
     flex-direction: column;
     align-items: center;
+    .card {
+      margin-top: 36px;
+      width: 240px;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.0392156863), 0 2px 8px rgba(0, 0, 0, 0.0784313725);
+      .card-item {
+        display: flex;
+        span {
+          flex: 3;
+          line-height: 36px;
+          height: 36px;
+          text-align: right;
+          font-size: 14px;
+          padding-right: 12px;
+        }
+        .num {
+          flex: 2;
+          padding: 0;
+          box-sizing: border-box;
+          text-align: left;
+          color: #e04255;
+          font-weight: bolder;
+        }
+      }
+    }
   }
 }
 </style>

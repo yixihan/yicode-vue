@@ -5,7 +5,7 @@
       <el-tab-pane label="题目描述" name="desc">
         <question-detail :questionId="questionId" :edit="false"></question-detail>
       </el-tab-pane>
-      <el-tab-pane label="评论" name="comment">
+      <el-tab-pane :label="'评论(' + ')'" name="comment">
         <mavon-editor
             v-model="common"
             :toolbarsFlag="false"
@@ -27,8 +27,12 @@
           </el-pagination>
         </div>
       </el-tab-pane>
-      <el-tab-pane label="题解" name="note">题解</el-tab-pane>
-      <el-tab-pane label="提交记录" name="record">提交记录</el-tab-pane>
+      <el-tab-pane :label="'题解(' + ')'" name="note">
+        <problem-explanation></problem-explanation>
+      </el-tab-pane>
+      <el-tab-pane label="提交记录" name="record">
+        <submit-records></submit-records>
+      </el-tab-pane>
     </el-tabs>
   </div>
   <div class="question-details-right">
@@ -41,10 +45,12 @@
 import QuestionDetail from "@/components/admin/QuestionDetail.vue";
 import Common from "@/components/common/Common.vue";
 import CommonSon from "@/components/common/CommonSon.vue";
+import SubmitRecords from "@/components/common/SubmitRecords.vue";
+import ProblemExplanation from "@/components/common/ProblemExplanation.vue";
 
 export default {
   name: "QuestionDetails",
-  components: {CommonSon, Common, QuestionDetail},
+  components: {ProblemExplanation, SubmitRecords, CommonSon, Common, QuestionDetail},
   data () {
     return {
       rightShow: 'desc',

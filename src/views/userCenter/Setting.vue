@@ -54,9 +54,12 @@
             <el-input v-model="userInfo.userRealName"></el-input>
           </el-form-item>
           <el-form-item label="用户个人网站">
-            <el-input v-for="(item, index) in websiteList"
-                      :key="index"
-                      v-model="item.value"></el-input>
+            <div class="web"  v-for="(item, index) in websiteList"
+                  :key="index">
+              <el-input v-model="item.value">
+              </el-input>
+              <i class="el-icon-close" @click="delWebsite(index)"></i>
+            </div>
             <el-button @click="modifyWebsite()">添加</el-button>
           </el-form-item>
           <el-form-item>
@@ -75,7 +78,8 @@
             <el-button @click="sendCode()">发送验证码</el-button>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="onSubmit()">修改</el-button>
+            <el-button type="danger" plain @click="unbindUserEmail()">解绑</el-button>
+            <el-button type="primary" @click="bindUserEmail()">修改</el-button>
           </el-form-item>
         </el-form>
       </el-tab-pane>
@@ -90,7 +94,8 @@
             <el-button @click="sendCode()">发送验证码</el-button>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="onSubmit">修改</el-button>
+            <el-button type="danger" plain @click="unbindUserMobile()">解绑</el-button>
+            <el-button type="primary" @click="bindUserMobile">修改</el-button>
           </el-form-item>
         </el-form>
       </el-tab-pane>
@@ -238,8 +243,9 @@ export default {
         value: ''
       })
     },
-    delWebsite() {
-
+    delWebsite(val) {
+      console.log(val)
+      this.websiteList.splice(val, 1)
     },
     // 获取用户信息
     getUserInfo() {
@@ -584,6 +590,23 @@ export default {
   }
 
   ::v-deep .el-form-item__content {
+    .web {
+      width: 300px;
+      height: 60px;
+      position: relative;
+      input {
+        margin: 10px 0;
+        padding-right: 30px
+      }
+      i {
+        position: absolute;
+        font-size: 20px;
+        right: 11px;
+        top: 20px;
+        color: #e04255;
+        cursor: pointer;
+      }
+    }
     .el-radio {
       height: 40px;
       line-height: 40px;
@@ -594,6 +617,11 @@ export default {
       float: left;
     }
 
+    .web + .el-button {
+      position: absolute;
+      top: 10px;
+      right: 0;
+    }
     .el-input + .el-button {
       position: absolute;
       right: 0;

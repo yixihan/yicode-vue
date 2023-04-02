@@ -193,7 +193,7 @@ export default {
         line-height: 40px;
       }
       a {
-        display: inline-block;
+        display: block;
         line-height: 26px;
         height: 26px;
         font-size: 12px;
