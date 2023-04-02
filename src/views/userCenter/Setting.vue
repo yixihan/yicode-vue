@@ -54,9 +54,9 @@
             <el-input v-model="userInfo.userRealName"></el-input>
           </el-form-item>
           <el-form-item label="用户个人网站">
-              <el-input v-for="(item, index) in websiteList"
-                        :key="index"
-                        v-model="item.value"></el-input>
+            <el-input v-for="(item, index) in websiteList"
+                      :key="index"
+                      v-model="item.value"></el-input>
             <el-button @click="modifyWebsite()">添加</el-button>
           </el-form-item>
           <el-form-item>
@@ -101,17 +101,17 @@
             <el-input v-model="pwdModify.account"></el-input>
           </el-form-item>
           <el-form-item label="验证码">
-            <el-input v-model="pwdModify.verificationCode"></el-input>
-            <el-button @click="sendCode()">发送验证码</el-button>
+            <el-input v-model="pwdModify.code"></el-input>
+            <el-button @click="sendResetCode()">发送验证码</el-button>
           </el-form-item>
           <el-form-item label="新密码">
-            <el-input v-model="pwdModify.pwd"></el-input>
+            <el-input type="password" v-model="pwdModify.newPassword"></el-input>
           </el-form-item>
           <el-form-item label="再次输入新密码">
-            <el-input v-model="pwdModify.pwdSecond"></el-input>
+            <el-input type="password" v-model="pwdModify.pwdSecond"></el-input>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="onSubmit()">修改</el-button>
+            <el-button type="primary" @click="modifyUserPassword()">修改</el-button>
           </el-form-item>
         </el-form>
       </el-tab-pane>
@@ -132,13 +132,14 @@
 
 <script>
 import {uuid} from "@/util/uuidUtil";
-import {successMsg} from "@/util/elementMsgUtil";
-import { provinceAndCityData } from 'element-china-area-data'
+import {errorMsg, successMsg} from "@/util/elementMsgUtil";
+import {provinceAndCityData} from 'element-china-area-data'
+import * as validate from "@/util/validateUtil";
 
 export default {
   name: "Setting",
   inject: ['reload'],
-  data () {
+  data() {
     return {
       activeName: 'info',
       // 用户信息
@@ -150,7 +151,7 @@ export default {
         userProvince: '',
         userRealName: '',
         userSchool: '',
-        userSex:'1',
+        userSex: '1',
         userSign: '',
         userWebsiteList: [],
       },
@@ -174,9 +175,12 @@ export default {
       // 密码修改
       pwdModify: {
         account: '',
-        pwd: '',
+        email: '',
+        mobile: '',
+        newPassword: '',
+        type: '',
         pwdSecond: '',
-        verificationCode: '',
+        code: '',
       },
       // 用户名修改
       nameModify: {
@@ -228,7 +232,7 @@ export default {
   },
   methods: {
     // 添加网站
-    modifyWebsite () {
+    modifyWebsite() {
       this.websiteList.push({
         name: '',
         value: ''
@@ -269,7 +273,49 @@ export default {
     },
     // 修改密码
     modifyUserPassword() {
+      if (this.pwdModify.account === '') {
+        errorMsg("请输入手机号/邮箱")
+        return;
+      }
+      if (this.pwdModify.code === '') {
+        errorMsg("请输入验证码")
+        return;
+      }
+      if (this.pwdModify.newPassword === '' || this.pwdModify.pwdSecond === '') {
+        errorMsg("请输入密码")
+        return;
+      }
+      // 校验密码
+      if (this.pwdModify.newPassword !== this.pwdModify.pwdSecond) {
+        errorMsg("两次密码不一致!")
+        return
+      }
 
+      // 校验验证码
+      if (!validate.validateCode(this.pwdModify.newPassword)) {
+        errorMsg("验证码不符合输入规范!")
+        return;
+      }
+
+      if (validate.validateEmail(this.pwdModify.account)) {
+        // 如果是邮箱
+        this.asyncResetPasswordByEmail().then(() => {
+          successMsg("密码重置成功")
+          this.$store.commit("removeInfo")
+          this.$router.push("/");
+          this.reload();
+        })
+      } else if (validate.validateMobile(this.pwdModify.account)) {
+        // 如果是手机号
+        this.asyncResetPasswordByMobile().then(() => {
+          successMsg("密码重置成功")
+          this.$store.commit("removeInfo")
+          this.$router.push("/");
+          this.reload();
+        });
+      } else {
+        errorMsg("输入错误!");
+      }
     },
     // 修改用户名
     modifyUserName() {
@@ -278,13 +324,54 @@ export default {
         this.getUserInfo()
       })
     },
+    // 重置密码 => 发送验证码
+    sendResetCode() {
+      if (this.pwdModify.account === '') {
+        errorMsg("请输入手机号/邮箱")
+        return;
+      }
+      if (validate.validateEmail(this.pwdModify.account)) {
+        // 如果是邮箱
+        this.asyncSendResetEmail().then(() => {
+          successMsg("邮件发送成功!")
+        })
+      } else if (validate.validateMobile(this.pwdModify.account)) {
+        // 如果是手机号
+        this.asyncSendResetMobile().then(() => {
+          successMsg("短信发送成功!")
+        });
+      } else {
+        errorMsg("输入错误!");
+      }
+    },
+    // 通用操作 => 发送验证码
+    sendCommonCode(account) {
+      if (account === '') {
+        errorMsg("请输入手机号/邮箱")
+        return;
+      }
+      if (validate.validateEmail(account)) {
+        // 如果是邮箱
+        this.asyncSendCommonEmail().then(() => {
+          successMsg("邮件发送成功!")
+        })
+      } else if (validate.validateMobile(account)) {
+        // 如果是手机号
+        this.asyncSendCommonMobile().then(() => {
+          successMsg("短信发送成功!")
+        });
+      } else {
+        errorMsg("输入错误!");
+      }
+    },
     // 发送验证码
-    sendCode () {
+    sendCode() {
       // 根据activeName定位
     },
-    onSubmit () {},
+    onSubmit() {
+    },
     // 更新 => 更改用户所在地
-    changeCity (value) {
+    changeCity(value) {
       this.userInfo.userProvince = value[0]
       this.userInfo.userCity = value[1]
     },
@@ -391,18 +478,33 @@ export default {
         }
       });
     },
+    // 异步方法 => 通过邮箱修改密码
+    async asyncResetPasswordByEmail() {
+      let data = {
+        "email": this.pwdModify.account,
+        "code": this.pwdModify.code,
+        "newPassword": this.pwdModify.newPassword,
+        "type": "EMAIL"
+      }
+
+      return await this.asyncResetPassword(data)
+    },
+    // 异步方法 => 通过邮箱修改密码
+    async asyncResetPasswordByMobile() {
+      let data = {
+        "mobile": this.pwdModify.account,
+        "code": this.pwdModify.code,
+        "newPassword": this.pwdModify.newPassword,
+        "type": "SMS"
+      }
+      return await this.asyncResetPassword(data)
+    },
     // 异步方法 => 修改用户密码
-    async asyncModifyUserPassword() {
+    async asyncResetPassword(data) {
       return await this.$axios({
-        url: "/yicode-user-openapi/open/user/info/modify",
+        url: "/yicode-user-openapi/open/user/reset/password",
         method: "post",
-        data: {
-          "email": "r.lkmnxi@qq.com",
-          "userId": 42,
-          "mobile": "18651714424",
-          "newPassword": "quis dolore do",
-          "type": "laborum"
-        }
+        data: data
       });
     },
     // 异步方法 => 修改用户用户名
@@ -421,7 +523,7 @@ export default {
         data: this.nameModify
       });
     },
-    // 异步方法 => 发送邮件
+    // 异步方法 => 发送通用邮件
     async asyncSendCommonEmail() {
       return await this.$axios({
         url: "/yicode-thirdpart-openapi/open/email/send/email/common",
@@ -431,18 +533,7 @@ export default {
         }
       });
     },
-    // 异步方法 => 校验邮箱验证码
-    async asyncValidateCommonEmailCode() {
-      return await this.$axios({
-        url: "/yicode-thirdpart-openapi/open/email/validate/common",
-        method: "post",
-        data: {
-          "email": '',
-          "code": ''
-        }
-      });
-    },
-    // 异步方法 => 发送短信
+    // 异步方法 => 发送通用短信
     async asyncSendCommonMobile() {
       return await this.$axios({
         url: "/yicode-thirdpart-openapi/open/sms/send/mobile/common",
@@ -452,56 +543,23 @@ export default {
         }
       });
     },
-    // 异步方法 => 校验短信验证码
-    async asyncValidateCommonMobileCode() {
-      return await this.$axios({
-        url: "/yicode-thirdpart-openapi/open/sms/validate/common",
-        method: "post",
-        data: {
-          "mobile": '',
-          "code": ''
-        }
-      });
-    },
-    // 异步方法 => 发送邮件
+    // 异步方法 => 发送重置密码邮件
     async asyncSendResetEmail() {
       return await this.$axios({
         url: "/yicode-thirdpart-openapi/open/email/send/email/reset",
         method: "post",
         data: {
-          "email": ''
+          "email": this.pwdModify.account,
         }
       });
     },
-    // 异步方法 => 校验邮箱验证码
-    async asyncValidateResetEmailCode() {
-      return await this.$axios({
-        url: "/yicode-thirdpart-openapi/open/email/validate/reset",
-        method: "post",
-        data: {
-          "email": '',
-          "code": ''
-        }
-      });
-    },
-    // 异步方法 => 发送短信
+    // 异步方法 => 发送重置密码短信
     async asyncSendResetMobile() {
       return await this.$axios({
         url: "/yicode-thirdpart-openapi/open/sms/send/mobile/reset",
         method: "post",
         data: {
-          "mobile": ''
-        }
-      });
-    },
-    // 异步方法 => 校验短信验证码
-    async asyncValidateResetMobileCode() {
-      return await this.$axios({
-        url: "/yicode-thirdpart-openapi/open/sms/validate/reset",
-        method: "post",
-        data: {
-          "mobile": '',
-          "code": ''
+          "mobile": this.pwdModify.account,
         }
       });
     },
@@ -512,26 +570,32 @@ export default {
 <style lang="scss" scoped>
 .setting {
   padding: 20px 50px;
+
   ::v-deep input {
     width: 300px !important;
     float: left;
   }
+
   .el-tabs {
     width: 600px !important;
   }
+
   ::v-deep .el-form-item__content {
     .el-radio {
       height: 40px;
       line-height: 40px;
       float: left;
     }
+
     .el-date-editor {
       float: left;
     }
+
     .el-input + .el-button {
       position: absolute;
       right: 0;
     }
+
     .avatar-uploader .el-upload {
       border: 1px dashed #d9d9d9;
       border-radius: 6px;
@@ -539,12 +603,15 @@ export default {
       position: relative;
       overflow: hidden;
     }
+
     .el-upload {
       float: left;
     }
+
     .avatar-uploader .el-upload:hover {
       border-color: #409EFF;
     }
+
     .avatar-uploader-icon {
       font-size: 28px;
       color: #8c939d;
@@ -553,11 +620,13 @@ export default {
       line-height: 178px;
       text-align: center;
     }
+
     .avatar {
       width: 178px;
       height: 178px;
       display: block;
     }
+
     .el-cascader {
       display: flex;
     }
