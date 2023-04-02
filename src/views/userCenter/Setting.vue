@@ -83,7 +83,7 @@
                        @click="unbindUserEmail()"
                        v-if="userEmail !== '' && userEmail === emailModify.email"
             >解绑</el-button>
-            <el-button type="primary" @click="bindUserEmail()">修改</el-button>
+            <el-button type="primary" @click="bindUserEmail()">绑定</el-button>
           </el-form-item>
         </el-form>
       </el-tab-pane>
@@ -103,7 +103,7 @@
                        @click="unbindUserMobile()"
                        v-if="userMobile !== '' && userMobile === mobileModify.mobile"
             >解绑</el-button>
-            <el-button type="primary" @click="bindUserMobile">修改</el-button>
+            <el-button type="primary" @click="bindUserMobile">绑定</el-button>
           </el-form-item>
         </el-form>
       </el-tab-pane>
