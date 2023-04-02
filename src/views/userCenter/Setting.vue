@@ -74,27 +74,35 @@
             <el-input v-model="emailModify.email"></el-input>
           </el-form-item>
           <el-form-item label="邮箱验证码">
-            <el-input v-model="emailModify.verificationCode"></el-input>
-            <el-button @click="sendCode()">发送验证码</el-button>
+            <el-input v-model="emailModify.code"></el-input>
+            <el-button @click="sendCommonCode(emailModify.email)">发送验证码</el-button>
           </el-form-item>
           <el-form-item>
-            <el-button type="danger" plain @click="unbindUserEmail()">解绑</el-button>
+            <el-button type="danger"
+                       plain
+                       @click="unbindUserEmail()"
+                       v-if="userEmail !== '' && userEmail === emailModify.email"
+            >解绑</el-button>
             <el-button type="primary" @click="bindUserEmail()">修改</el-button>
           </el-form-item>
         </el-form>
       </el-tab-pane>
       <!-- 用户手机号设置 -->
       <el-tab-pane label="手机号修改" name="mobile">
-        <el-form label-position="right" label-width="150px" :model="phoneModify">
+        <el-form label-position="right" label-width="150px" :model="mobileModify">
           <el-form-item label="用户手机号" width="300px">
-            <el-input v-model="phoneModify.phone"></el-input>
+            <el-input v-model="mobileModify.mobile"></el-input>
           </el-form-item>
           <el-form-item label="手机验证码">
-            <el-input v-model="phoneModify.verificationCode"></el-input>
-            <el-button @click="sendCode()">发送验证码</el-button>
+            <el-input v-model="mobileModify.code"></el-input>
+            <el-button @click="sendCommonCode(mobileModify.mobile)">发送验证码</el-button>
           </el-form-item>
           <el-form-item>
-            <el-button type="danger" plain @click="unbindUserMobile()">解绑</el-button>
+            <el-button type="danger"
+                       plain
+                       @click="unbindUserMobile()"
+                       v-if="userMobile !== '' && userMobile === mobileModify.mobile"
+            >解绑</el-button>
             <el-button type="primary" @click="bindUserMobile">修改</el-button>
           </el-form-item>
         </el-form>
@@ -147,6 +155,8 @@ export default {
   data() {
     return {
       activeName: 'info',
+      userEmail: this.$store.getters.getUser.userEmail,
+      userMobile: this.$store.getters.getUser.userMobile,
       // 用户信息
       userInfo: {
         userId: 0,
@@ -169,13 +179,13 @@ export default {
       ],
       // 邮箱修改
       emailModify: {
-        email: '',
-        verificationCode: '',
+        email: this.$store.getters.getUser.userEmail,
+        code: '',
       },
       // 手机号修改
-      phoneModify: {
-        phone: '',
-        verificationCode: '',
+      mobileModify: {
+        mobile: this.$store.getters.getUser.userMobile,
+        code: '',
       },
       // 密码修改
       pwdModify: {
@@ -266,19 +276,92 @@ export default {
     },
     // 绑定邮箱
     bindUserEmail() {
+      // 校验邮箱
+      if (this.emailModify.email === '') {
+        errorMsg("请输入邮箱")
+        return
+      }
+      if (!validate.validateEmail(this.emailModify.email)) {
+        errorMsg("邮箱不符合规范")
+        return;
+      }
+      // 校验验证码
+      if (!validate.validateCode(this.emailModify.code)) {
+        errorMsg("验证码不符合输入规范!")
+        return;
+      }
+
+      this.asyncBindUserEmail().then(() => {
+        successMsg("邮箱绑定成功")
+        this.logout()
+      })
 
     },
     // 解绑邮箱
     unbindUserEmail() {
+      // 校验邮箱
+      if (this.emailModify.email === '') {
+        errorMsg("请输入邮箱")
+        return
+      }
+      if (!validate.validateEmail(this.emailModify.email)) {
+        errorMsg("邮箱不符合规范")
+        return;
+      }
+      // 校验验证码
+      if (!validate.validateCode(this.emailModify.code)) {
+        errorMsg("验证码不符合输入规范!")
+        return;
+      }
 
+      this.asyncUnbindUserEmail().then(() => {
+        successMsg("邮箱解绑成功")
+        this.logout()
+      })
     },
     // 绑定手机号
     bindUserMobile() {
+      // 校验手机号
+      if (this.mobileModify.mobile === '') {
+        errorMsg("请输入手机号")
+        return
+      }
+      if (!validate.validateMobile(this.mobileModify.mobile)) {
+        errorMsg("手机号不符合规范")
+        return;
+      }
+      // 校验验证码
+      if (!validate.validateCode(this.mobileModify.code)) {
+        errorMsg("验证码不符合输入规范!")
+        return;
+      }
 
+      this.asyncBindUserMobile().then(() => {
+        successMsg("手机号绑定成功")
+        this.logout()
+      })
     },
     // 解绑手机号
     unbindUserMobile() {
+      // 校验手机号
+      if (this.mobileModify.mobile === '') {
+        errorMsg("请输入手机号")
+        return
+      }
+      if (!validate.validateMobile(this.mobileModify.mobile)) {
+        errorMsg("手机号不符合规范")
+        return;
+      }
+      // 校验验证码
+      if (!validate.validateCode(this.mobileModify.code)) {
+        errorMsg("验证码不符合输入规范!")
+        return;
+      }
 
+      this.asyncUnbindUserMobile().then(() => {
+        successMsg("手机号解绑成功")
+        this.logout()
+      })
     },
     // 修改密码
     modifyUserPassword() {
@@ -301,7 +384,7 @@ export default {
       }
 
       // 校验验证码
-      if (!validate.validateCode(this.pwdModify.newPassword)) {
+      if (!validate.validateCode(this.pwdModify.code)) {
         errorMsg("验证码不符合输入规范!")
         return;
       }
@@ -310,17 +393,13 @@ export default {
         // 如果是邮箱
         this.asyncResetPasswordByEmail().then(() => {
           successMsg("密码重置成功")
-          this.$store.commit("removeInfo")
-          this.$router.push("/");
-          this.reload();
+          this.logout()
         })
       } else if (validate.validateMobile(this.pwdModify.account)) {
         // 如果是手机号
         this.asyncResetPasswordByMobile().then(() => {
           successMsg("密码重置成功")
-          this.$store.commit("removeInfo")
-          this.$router.push("/");
-          this.reload();
+          this.logout()
         });
       } else {
         errorMsg("输入错误!");
@@ -355,34 +434,35 @@ export default {
     },
     // 通用操作 => 发送验证码
     sendCommonCode(account) {
+      console.log(account)
       if (account === '') {
         errorMsg("请输入手机号/邮箱")
         return;
       }
       if (validate.validateEmail(account)) {
         // 如果是邮箱
-        this.asyncSendCommonEmail().then(() => {
+        this.asyncSendCommonEmail(account).then(() => {
           successMsg("邮件发送成功!")
         })
       } else if (validate.validateMobile(account)) {
         // 如果是手机号
-        this.asyncSendCommonMobile().then(() => {
+        this.asyncSendCommonMobile(account).then(() => {
           successMsg("短信发送成功!")
         });
       } else {
         errorMsg("输入错误!");
       }
     },
-    // 发送验证码
-    sendCode() {
-      // 根据activeName定位
-    },
-    onSubmit() {
-    },
     // 更新 => 更改用户所在地
     changeCity(value) {
       this.userInfo.userProvince = value[0]
       this.userInfo.userCity = value[1]
+    },
+    // 更新 => 登出
+    logout() {
+      this.$store.commit("removeInfo")
+      this.$router.push("/");
+      this.reload();
     },
     // 初始化 => 同步用户网站
     initUserWebsite() {
@@ -449,19 +529,19 @@ export default {
         url: "/yicode-user-openapi/open/user/bind/email",
         method: "post",
         data: {
-          "email": "a.ecpwol@qq.com",
-          "code": "21"
+          "email": this.emailModify.email,
+          "code": this.emailModify.code
         }
       });
     },
     // 异步方法 => 解绑邮箱
     async asyncUnbindUserEmail() {
       return await this.$axios({
-        url: "/yicode-user-openapi/open/user/info/modify",
+        url: "/yicode-user-openapi/open/user/unbind/email",
         method: "post",
         data: {
-          "email": "a.ecpwol@qq.com",
-          "code": "21"
+          "email": this.emailModify.email,
+          "code": this.emailModify.code
         }
       });
     },
@@ -471,19 +551,19 @@ export default {
         url: "/yicode-user-openapi/open/user/bind/mobile",
         method: "post",
         data: {
-          "mobile": "18133820517",
-          "code": "44"
+          "mobile": this.mobileModify.mobile,
+          "code": this.mobileModify.code
         }
       });
     },
     // 异步方法 => 解绑手机号
     async asyncUnbindUserMobile() {
       return await this.$axios({
-        url: "/yicode-user-openapi/open/user/info/modify",
+        url: "/yicode-user-openapi/open/user/unbind/mobile",
         method: "post",
         data: {
-          "mobile": "18133820517",
-          "code": "44"
+          "mobile": this.mobileModify.mobile,
+          "code": this.mobileModify.code
         }
       });
     },
@@ -533,22 +613,22 @@ export default {
       });
     },
     // 异步方法 => 发送通用邮件
-    async asyncSendCommonEmail() {
+    async asyncSendCommonEmail(email) {
       return await this.$axios({
         url: "/yicode-thirdpart-openapi/open/email/send/email/common",
         method: "post",
         data: {
-          "email": ''
+          "email": email
         }
       });
     },
     // 异步方法 => 发送通用短信
-    async asyncSendCommonMobile() {
+    async asyncSendCommonMobile(mobile) {
       return await this.$axios({
         url: "/yicode-thirdpart-openapi/open/sms/send/mobile/common",
         method: "post",
         data: {
-          "mobile": ''
+          "mobile": mobile
         }
       });
     },
