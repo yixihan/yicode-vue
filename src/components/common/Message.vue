@@ -1,54 +1,25 @@
 <template>
 <div class="message">
-  <div class="message_header">
-    <div>未读</div>
-    <div>已读</div>
-  </div>
+<!--  <div class="message_header">-->
+<!--    <div>未读</div>-->
+<!--    <div>已读</div>-->
+<!--  </div>-->
   <div class="message_body">
     <div class="bar">
-      <i class="el-icon-brush"></i>
+      <i class="el-icon-brush" @click="readMessageBatch(idList)"></i>
     </div>
-    <div class="message-item">
-      <img src="" alt=""/>
-      <div class="pot"></div>
+    <div class="message-item"
+         v-for="(item, index) in messageData"
+         :key="index"
+         @click="readMessage(item.id)"
+    >
+      <img src="@/assets/img/admin/test03.png/" alt="正在加载中"/>
+      <div class="pot" v-if="!item.finish"></div>
       <div class="name">
-        Mingzi
+        {{ item.sendUserName }}
       </div>
       <div class="text">
-        hhahhahahahahahhahahahahahahhahahahahhahah
-      </div>
-      <div class="time">2023-12-12 13:12:00</div>
-    </div>
-    <div class="message-item">
-      <img src="" alt=""/>
-      <div class="pot"></div>
-      <div class="name">
-        Mingzi
-      </div>
-      <div class="text">
-        hhahhahahahahahhahahahahahahhahahahahhahah
-      </div>
-      <div class="time">2023-12-12 13:12:00</div>
-    </div>
-    <div class="message-item">
-      <img src="" alt=""/>
-      <div class="pot"></div>
-      <div class="name">
-        Mingzi
-      </div>
-      <div class="text">
-        hhahhahahahahahhahahahahahahhahahahahhahah
-      </div>
-      <div class="time">2023-12-12 13:12:00</div>
-    </div>
-    <div class="message-item">
-      <img src="" alt=""/>
-      <div class="pot"></div>
-      <div class="name">
-        Mingzi
-      </div>
-      <div class="text">
-        hhahhahahahahahhahahahahahahhahahahahhahah
+        {{ item.msg }}
       </div>
       <div class="time">2023-12-12 13:12:00</div>
     </div>
@@ -58,7 +29,76 @@
 
 <script>
 export default {
-  name: "Message"
+  name: "Message",
+  data() {
+    return {
+      page: 1,
+      // 消息数据
+      messageData: [
+        {
+          id: 0,
+          sendUserId: 0,
+          sendUserName: "",
+          sendUserAvatar: '',
+          receiveUseId: 0,
+          msg: "",
+          finish: false,
+          createTime: "",
+          updateTime: ""
+        }
+      ],
+      idList: [],
+    }
+  },
+  mounted() {
+    this.getMessageDetail()
+  },
+  methods: {
+    // 获取消息明细
+    getMessageDetail() {
+      this.asyncGetMessageDetail().then(({data}) => {
+        this.messageData = data.data.records
+        this.idList = []
+        this.messageData.forEach(item => {
+          this.idList.push(item.id)
+        })
+      })
+    },
+    // 批量阅读消息
+    readMessageBatch(idList) {
+      this.asyncReadMessage(idList).then(() => {
+        this.getMessageDetail()
+      })
+    },
+    // 阅读单个消息
+    readMessage(id) {
+      let idList = []
+      idList.push(id)
+      this.readMessageBatch(idList)
+    },
+    // 异步方法 => 绑定手机号
+    async asyncGetMessageDetail() {
+      return await this.$axios({
+        url: "/yicode-user-openapi/open/msg/detail",
+        method: "post",
+        data: {
+          "searchCount": false,
+          "page": this.page,
+          "pageSize": 10
+        }
+      });
+    },
+    // 异步方法 => 绑定手机号
+    async asyncReadMessage(idList) {
+      return await this.$axios({
+        url: "/yicode-user-openapi/open/msg/read",
+        method: "post",
+        data: {
+          "messageIdList": idList,
+        }
+      });
+    },
+  }
 }
 </script>
 
